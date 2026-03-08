@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SMB Financial Health Dashboard</title>
+  <meta name="description" content="A portfolio-grade consulting analytics tool that simulates how a tech consultant analyzes the financial health of SaaS SMBs — built with Python, Pandas, Streamlit, and Plotly." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Variables ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:       #0b1437;
+      --navy-light: #131d4f;
+      --card-bg:    #111936;
+      --border:     #1e2d6b;
+      --border-mid: #253580;
+      --white:      #f0f4ff;
+      --muted:      #8b95c9;
+      --accent:     #4f8ef7;
+      --teal:       #00c896;
+      --amber:      #f5a623;
+      --red:        #e84545;
+      --radius:     12px;
+      --radius-sm:  8px;
+      --transition: 0.25s ease;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── Scroll Animations ─────────────────────────────────────────────── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-up:nth-child(2) { transition-delay: 0.1s; }
+    .fade-up:nth-child(3) { transition-delay: 0.2s; }
+    .fade-up:nth-child(4) { transition-delay: 0.3s; }
+    .fade-up:nth-child(5) { transition-delay: 0.4s; }
+
+    /* ── Utility ───────────────────────────────────────────────────────── */
+    .section { padding: 96px 0; }
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 580px;
+      line-height: 1.7;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+    .rag-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .badge-green { background: rgba(0,200,150,0.12); color: var(--teal); border: 1px solid rgba(0,200,150,0.4); }
+    .badge-amber { background: rgba(245,166,35,0.12); color: var(--amber); border: 1px solid rgba(245,166,35,0.4); }
+    .badge-red   { background: rgba(232,69,69,0.12);  color: var(--red);   border: 1px solid rgba(232,69,69,0.4); }
+
+    /* ── Navigation ────────────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11,20,55,0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      height: 60px;
+      gap: 32px;
+    }
+    .nav-logo {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+      margin-right: auto;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      transition: color var(--transition);
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-cta {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--accent);
+      color: #fff;
+      transition: background var(--transition), transform var(--transition);
+      white-space: nowrap;
+    }
+    .nav-cta:hover { background: #3a78e8; transform: translateY(-1px); }
+    .nav-hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; }
+
+    /* ── Hero ──────────────────────────────────────────────────────────── */
+    #hero {
+      padding: 96px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 40%, rgba(79,142,247,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 30% 60%, rgba(0,200,150,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--teal);
+      background: rgba(0,200,150,0.08);
+      border: 1px solid rgba(0,200,150,0.25);
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--teal);
+      border-radius: 50%;
+    }
+    .hero-title {
+      font-size: clamp(30px, 5vw, 52px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+    .hero-title .accent { color: var(--accent); }
+    .hero-desc {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 32px;
+      max-width: 520px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+    .btn-primary:hover {
+      background: #3a78e8;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(79,142,247,0.3);
+    }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: transparent;
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-mid);
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      background: rgba(79,142,247,0.07);
+    }
+    .tech-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tech-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    /* Stats row */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 64px;
+    }
+    .stat-item {
+      background: var(--card-bg);
+      padding: 20px 24px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-number .accent { color: var(--accent); }
+    .stat-label { font-size: 12px; color: var(--muted); }
+
+    /* ── Dashboard Preview Mockup ──────────────────────────────────────── */
+    #preview { padding: 80px 0; background: var(--navy-light); }
+    .preview-frame {
+      border-radius: 14px;
+      border: 1px solid var(--border-mid);
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(79,142,247,0.15),
+        0 24px 80px rgba(0,0,0,0.6),
+        0 0 80px rgba(79,142,247,0.08);
+    }
+    /* Browser chrome */
+    .browser-chrome {
+      background: #0a1228;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .chrome-dots { display: flex; gap: 6px; }
+    .chrome-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .chrome-dot.red   { background: #ff5f56; }
+    .chrome-dot.amber { background: #ffbd2e; }
+    .chrome-dot.green { background: #27c93f; }
+    .chrome-url {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    /* App shell */
+    .app-shell {
+      display: flex;
+      height: 520px;
+      overflow: hidden;
+    }
+    /* Sidebar */
+    .app-sidebar {
+      width: 200px;
+      flex-shrink: 0;
+      background: var(--navy-light);
+      border-right: 1px solid var(--border);
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .sb-logo-line { font-size: 13px; font-weight: 800; color: var(--white); }
+    .sb-label { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .sb-select {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 11px;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sb-select::after { content: '▾'; color: var(--muted); font-size: 10px; }
+    .sb-profile-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .sb-profile-title { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .sb-profile-text { font-size: 10px; color: var(--white); line-height: 1.5; }
+    .sb-profile-meta { font-size: 9px; color: var(--muted); margin-top: 6px; }
+    .sb-slider-track {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      position: relative;
+      margin-top: 4px;
+    }
+    .sb-slider-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+    .sb-slider-thumb {
+      position: absolute;
+      right: -4px;
+      top: -4px;
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      border: 2px solid var(--navy-light);
+    }
+    /* Main content */
+    .app-main {
+      flex: 1;
+      padding: 16px 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    /* App header */
+    .app-header { display: flex; align-items: flex-start; justify-content: space-between; }
+    .app-title { font-size: 14px; font-weight: 800; color: var(--white); }
+    .app-sub { font-size: 9px; color: var(--muted); margin-top: 2px; }
+    .health-pill {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(232,69,69,0.12);
+      border: 1px solid var(--red);
+      color: var(--red);
+    }
+    /* Metric cards row */
+    .metric-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .mc {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 10px;
+    }
+    .mc-label { font-size: 8px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .mc-value { font-size: 16px; font-weight: 700; color: var(--white); line-height: 1; }
+    .mc-sub { font-size: 8px; color: var(--muted); margin-top: 3px; }
+    .mc-delta-pos { color: var(--teal); font-size: 8px; font-weight: 600; margin-top: 3px; }
+    .mc-delta-neg { color: var(--red); font-size: 8px; font-weight: 600; margin-top: 3px; }
+    /* Tabs */
+    .tab-row { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+    .tab-item {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 6px 12px;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .tab-item.active { color: var(--accent); border-bottom-color: var(--accent); }
+    /* Chart area */
+    .chart-area {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .chart-title { font-size: 9px; color: var(--muted); margin-bottom: 6px; }
+    .chart-svg-wrap { flex: 1; }
+    /* RAG mini-table */
+    .rag-mini { display: flex; flex-direction: column; gap: 0; }
+    .rag-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; border-bottom: 1px solid var(--border); font-size: 9px; }
+    .rag-row:last-child { border-bottom: none; }
+    .rag-kpi { color: var(--white); font-weight: 600; }
+    .rag-val { color: var(--muted); flex: 1; padding-left: 8px; }
+    .rag-mini-badge {
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 9px;
+      font-weight: 700;
+    }
+    .rm-green { background: rgba(0,200,150,0.12); color: var(--teal); }
+    .rm-amber { background: rgba(245,166,35,0.12); color: var(--amber); }
+    .rm-red   { background: rgba(232,69,69,0.12);  color: var(--red); }
+
+    /* ── Features ──────────────────────────────────────────────────────── */
+    #features { padding: 96px 0; }
+    .features-header { text-align: center; margin-bottom: 56px; }
+    .features-header .section-sub { margin: 0 auto; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(79,142,247,0.12);
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .feature-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+    .feature-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .feature-tag {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+      background: rgba(79,142,247,0.1);
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+
+    /* ── Companies ─────────────────────────────────────────────────────── */
+    #companies { padding: 96px 0; background: var(--navy-light); }
+    .companies-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
+    .company-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      transition: border-color var(--transition);
+    }
+    .company-card:hover { border-color: var(--border-mid); }
+    .company-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .company-name { font-size: 20px; font-weight: 800; color: var(--white); }
+    .company-industry { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .company-founded {
+      font-size: 11px;
+      padding: 4px 10px;
+      background: var(--navy-light);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+    }
+    .company-desc { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 20px; }
+    .company-signals { margin-bottom: 20px; }
+    .signal-title { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .signal-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .signal-dot { flex-shrink: 0; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-top: 6px; }
+    .rag-summary { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .rag-summary-label { font-size: 11px; font-weight: 600; color: var(--muted); }
+
+    /* ── Benchmarks Table ──────────────────────────────────────────────── */
+    #benchmarks { padding: 96px 0; }
+    .bench-table { width: 100%; border-collapse: collapse; margin-top: 40px; font-size: 13px; }
+    .bench-table thead th {
+      background: var(--navy-light);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 12px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .bench-table tbody td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      color: var(--white);
+      vertical-align: middle;
+    }
+    .bench-table tbody tr:last-child td { border-bottom: none; }
+    .bench-table tbody tr:hover td { background: rgba(79,142,247,0.04); }
+    .bench-table .kpi-cell { font-weight: 600; }
+    .bench-cell-green { color: var(--teal); font-weight: 600; }
+    .bench-cell-amber { color: var(--amber); font-weight: 600; }
+    .bench-cell-red   { color: var(--red);   font-weight: 600; }
+    .bench-source { font-size: 11px; color: var(--muted); }
+    .table-wrap {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    /* ── Tech Stack ────────────────────────────────────────────────────── */
+    #stack { padding: 96px 0; background: var(--navy-light); }
+    .stack-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 48px;
+      justify-content: center;
+    }
+    .stack-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      text-align: center;
+      min-width: 140px;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .stack-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .stack-icon { font-size: 32px; margin-bottom: 10px; }
+    .stack-name { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+    .stack-role { font-size: 11px; color: var(--muted); }
+
+    /* ── Skills ────────────────────────────────────────────────────────── */
+    #skills { padding: 96px 0; }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .skill-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+    }
+    .skill-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .skill-name { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+    .skill-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── Footer ────────────────────────────────────────────────────────── */
+    footer {
+      background: #080e2b;
+      border-top: 1px solid var(--border);
+      padding: 40px 28px;
+      text-align: center;
+    }
+    .footer-inner { max-width: 1120px; margin: 0 auto; }
+    .footer-logo { font-size: 15px; font-weight: 800; color: var(--white); margin-bottom: 10px; }
+    .footer-desc { font-size: 12px; color: var(--muted); line-height: 1.7; max-width: 460px; margin: 0 auto 20px; }
+    .footer-links { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .footer-links a { font-size: 13px; color: var(--muted); transition: color var(--transition); }
+    .footer-links a:hover { color: var(--white); }
+    .footer-copy { font-size: 11px; color: #3d4a7a; }
+
+    /* ── Mobile ────────────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .companies-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .app-sidebar { display: none; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+    }
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: repeat(2, 1fr); }
+      .stack-grid { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ─────────────────────────────────────────────────────────── -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo">SMB <span>Financial</span> Dashboard</div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#preview">Preview</a></li>
+      <li><a href="#companies">Companies</a></li>
+      <li><a href="#benchmarks">Benchmarks</a></li>
+      <li><a href="#stack">Stack</a></li>
+    </ul>
+    <a href="https://github.com/" class="nav-cta" id="nav-github">View on GitHub</a>
+    <div class="nav-hamburger" onclick="toggleMobileNav()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow">Portfolio Project · Tech Consulting</div>
+        <h1 class="hero-title">
+          SMB <span class="accent">Financial Health</span> Dashboard
+        </h1>
+        <p class="hero-desc">
+          A portfolio-grade consulting analytics tool that simulates how a tech consultant
+          analyzes the financial health of SaaS companies — complete with synthetic data,
+          KPI benchmarking, RAG status scoring, and auto-generated findings.
+        </p>
+        <div class="hero-actions">
+          <a href="https://github.com/" class="btn-primary" id="hero-github">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.929.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            View on GitHub
+          </a>
+          <a href="#preview" class="btn-ghost">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            See Preview
+          </a>
+        </div>
+        <div class="tech-badges">
+          <span class="tech-badge">Python 3.11</span>
+          <span class="tech-badge">Pandas 2.2</span>
+          <span class="tech-badge">Streamlit 1.32</span>
+          <span class="tech-badge">Plotly 5.20</span>
+          <span class="tech-badge">NumPy 1.26</span>
+        </div>
+      </div>
+      <!-- right col: stats -->
+      <div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-number"><span class="accent" data-count="24" data-suffix="">0</span></div>
+            <div class="stat-label">months of synthetic data</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number"><span class="accent" data-count="6" data-suffix="">0</span></div>
+            <div class="stat-label">KPIs tracked</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number"><span class="accent" data-count="2" data-suffix="">0</span></div>
+            <div class="stat-label">company profiles</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number"><span class="accent" data-count="5" data-suffix="">0</span></div>
+            <div class="stat-label">dashboard sections</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── Dashboard Preview ───────────────────────────────────────────────────── -->
+<section id="preview" class="section" style="background:var(--navy-light); padding: 80px 0;">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:48px;">
+      <div class="section-label">Live Preview</div>
+      <h2 class="section-title">The dashboard, up close</h2>
+      <p class="section-sub" style="margin:0 auto;">
+        A CSS replica of the actual Streamlit interface — same layout, same color system,
+        same RAG status logic. Swap companies in the sidebar and the entire view updates.
+      </p>
+    </div>
+
+    <div class="preview-frame fade-up">
+      <!-- Browser chrome -->
+      <div class="browser-chrome">
+        <div class="chrome-dots">
+          <div class="chrome-dot red"></div>
+          <div class="chrome-dot amber"></div>
+          <div class="chrome-dot green"></div>
+        </div>
+        <div class="chrome-url">localhost:8501 · SMB Financial Health Dashboard</div>
+      </div>
+
+      <!-- App shell -->
+      <div class="app-shell">
+        <!-- Sidebar -->
+        <div class="app-sidebar">
+          <div>
+            <div class="sb-logo-line">SMB Financial</div>
+            <div style="font-size:9px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted);">Health Dashboard</div>
+          </div>
+          <div>
+            <div class="sb-label">Select Company</div>
+            <div class="sb-select" style="font-size:11px;">NovaSaaS</div>
+          </div>
+          <div class="sb-profile-card">
+            <div class="sb-profile-title">Company Profile</div>
+            <div class="sb-profile-text">B2B project management SaaS — healthy growth with rising cost pressure</div>
+            <div class="sb-profile-meta">Industry: SaaS / Project Management</div>
+            <div class="sb-profile-meta">Founded: 2020</div>
+          </div>
+          <div>
+            <div class="sb-label" style="margin-bottom:8px;">Date Range</div>
+            <div style="font-size:10px; color:var(--white); margin-bottom:6px;">24 months</div>
+            <div class="sb-slider-track">
+              <div class="sb-slider-fill"></div>
+              <div class="sb-slider-thumb"></div>
+            </div>
+          </div>
+          <div style="margin-top:auto; font-size:9px; color:var(--muted); line-height:1.6;">
+            Built with Python · Pandas<br>Streamlit · Plotly<br>Synthetic data only.
+          </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="app-main" style="background:var(--navy);">
+          <!-- Header -->
+          <div class="app-header">
+            <div>
+              <div class="app-title">SMB Financial Health Dashboard</div>
+              <div class="app-sub">Consulting Analytics · 24-Month Synthetic Data · Dec 2024 (Latest)</div>
+            </div>
+            <div>
+              <div style="font-size:8px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; text-align:right; margin-bottom:4px;">Overall Health</div>
+              <div class="health-pill">RED</div>
+              <div style="font-size:8px; color:var(--muted); margin-top:3px; text-align:right;">1G · 1A · 4R</div>
+            </div>
+          </div>
+
+          <!-- Section label -->
+          <div style="font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:4px;">
+            01 · Company Overview
+          </div>
+
+          <!-- Metric cards -->
+          <div class="metric-row">
+            <div class="mc">
+              <div class="mc-label">Monthly Revenue</div>
+              <div class="mc-value">$403K</div>
+              <div class="mc-delta-pos">+3.2% MoM</div>
+            </div>
+            <div class="mc">
+              <div class="mc-label">Cash Balance</div>
+              <div class="mc-value">$891K</div>
+              <div class="mc-sub">8 mo runway</div>
+            </div>
+            <div class="mc">
+              <div class="mc-label">Gross Margin</div>
+              <div class="mc-value">72.1%</div>
+              <div class="mc-sub">Benchmark: 70%</div>
+            </div>
+            <div class="mc">
+              <div class="mc-label">Net Cash Flow</div>
+              <div class="mc-value" style="color:var(--red);">-$104K</div>
+              <div class="mc-delta-neg">Burning cash</div>
+            </div>
+            <div class="mc">
+              <div class="mc-label">Headcount</div>
+              <div class="mc-value">32</div>
+              <div class="mc-sub">$12.6K/emp/mo</div>
+            </div>
+          </div>
+
+          <!-- Chart section -->
+          <div style="font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:4px;">
+            02 · Financial Trends
+          </div>
+          <div class="tab-row">
+            <div class="tab-item active">Revenue & Profitability</div>
+            <div class="tab-item">Cost Structure</div>
+            <div class="tab-item">Headcount & Productivity</div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:3fr 1.4fr; gap:10px; flex:1; min-height:0;">
+            <!-- Chart -->
+            <div class="chart-area">
+              <div class="chart-title">Revenue vs. Gross Profit (24 months)</div>
+              <div class="chart-svg-wrap">
+                <svg viewBox="0 0 340 120" width="100%" height="100%" preserveAspectRatio="none" style="display:block;">
+                  <!-- Grid lines -->
+                  <line x1="0" y1="30"  x2="340" y2="30"  stroke="#1a2460" stroke-width="0.5"/>
+                  <line x1="0" y1="60"  x2="340" y2="60"  stroke="#1a2460" stroke-width="0.5"/>
+                  <line x1="0" y1="90"  x2="340" y2="90"  stroke="#1a2460" stroke-width="0.5"/>
+                  <!-- Revenue area fill -->
+                  <defs>
+                    <linearGradient id="rev-fill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#4f8ef7" stop-opacity="0.2"/>
+                      <stop offset="100%" stop-color="#4f8ef7" stop-opacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="gp-fill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#00c896" stop-opacity="0.15"/>
+                      <stop offset="100%" stop-color="#00c896" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Revenue area -->
+                  <path d="M0,88 L14,84 L28,80 L42,77 L56,72 L70,68 L84,64 L98,60 L112,56 L126,54 L140,51 L154,48 L168,45 L182,42 L196,44 L210,40 L224,37 L238,34 L252,31 L266,28 L280,26 L294,23 L308,21 L322,18 L340,16 L340,120 L0,120 Z"
+                        fill="url(#rev-fill)"/>
+                  <!-- Revenue line -->
+                  <path d="M0,88 L14,84 L28,80 L42,77 L56,72 L70,68 L84,64 L98,60 L112,56 L126,54 L140,51 L154,48 L168,45 L182,42 L196,44 L210,40 L224,37 L238,34 L252,31 L266,28 L280,26 L294,23 L308,21 L322,18 L340,16"
+                        fill="none" stroke="#4f8ef7" stroke-width="2" stroke-linejoin="round"/>
+                  <!-- GP area -->
+                  <path d="M0,95 L14,92 L28,89 L42,87 L56,84 L70,81 L84,78 L98,75 L112,72 L126,70 L140,68 L154,65 L168,63 L182,60 L196,62 L210,58 L224,55 L238,52 L252,49 L266,47 L280,45 L294,42 L308,40 L322,38 L340,36 L340,120 L0,120 Z"
+                        fill="url(#gp-fill)"/>
+                  <!-- GP line -->
+                  <path d="M0,95 L14,92 L28,89 L42,87 L56,84 L70,81 L84,78 L98,75 L112,72 L126,70 L140,68 L154,65 L168,63 L182,60 L196,62 L210,58 L224,55 L238,52 L252,49 L266,47 L280,45 L294,42 L308,40 L322,38 L340,36"
+                        fill="none" stroke="#00c896" stroke-width="1.5" stroke-linejoin="round"/>
+                  <!-- Legend -->
+                  <rect x="4" y="4" width="6" height="2" fill="#4f8ef7" rx="1"/>
+                  <text x="13" y="7.5" fill="#8b95c9" font-size="5" font-family="Inter, sans-serif">Revenue</text>
+                  <rect x="55" y="4" width="6" height="2" fill="#00c896" rx="1"/>
+                  <text x="64" y="7.5" fill="#8b95c9" font-size="5" font-family="Inter, sans-serif">Gross Profit</text>
+                  <!-- X axis labels -->
+                  <text x="0"   y="118" fill="#8b95c9" font-size="4.5" font-family="Inter, sans-serif">Jan'23</text>
+                  <text x="78"  y="118" fill="#8b95c9" font-size="4.5" font-family="Inter, sans-serif">Jul'23</text>
+                  <text x="158" y="118" fill="#8b95c9" font-size="4.5" font-family="Inter, sans-serif">Jan'24</text>
+                  <text x="238" y="118" fill="#8b95c9" font-size="4.5" font-family="Inter, sans-serif">Jul'24</text>
+                  <text x="310" y="118" fill="#8b95c9" font-size="4.5" font-family="Inter, sans-serif">Dec'24</text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Mini RAG scorecard -->
+            <div class="chart-area" style="min-width:0;">
+              <div class="chart-title" style="margin-bottom:8px;">KPI Scorecard</div>
+              <div class="rag-mini">
+                <div class="rag-row">
+                  <div class="rag-kpi">Gross Margin</div>
+                  <div class="rag-val">72.1%</div>
+                  <div class="rag-mini-badge rm-green">GREEN</div>
+                </div>
+                <div class="rag-row">
+                  <div class="rag-kpi">Rev Growth</div>
+                  <div class="rag-val">3.2%</div>
+                  <div class="rag-mini-badge rm-amber">AMBER</div>
+                </div>
+                <div class="rag-row">
+                  <div class="rag-kpi">OpEx Ratio</div>
+                  <div class="rag-val">64.5%</div>
+                  <div class="rag-mini-badge rm-red">RED</div>
+                </div>
+                <div class="rag-row">
+                  <div class="rag-kpi">Rev/Employee</div>
+                  <div class="rag-val">$12.6K</div>
+                  <div class="rag-mini-badge rm-amber">AMBER</div>
+                </div>
+                <div class="rag-row">
+                  <div class="rag-kpi">Burn Rate</div>
+                  <div class="rag-val">-$104K</div>
+                  <div class="rag-mini-badge rm-red">RED</div>
+                </div>
+                <div class="rag-row">
+                  <div class="rag-kpi">Runway</div>
+                  <div class="rag-val">8 mo</div>
+                  <div class="rag-mini-badge rm-red">RED</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p style="text-align:center; font-size:12px; color:var(--muted); margin-top:16px;">
+      CSS mockup — representative of the actual Streamlit interface. Run locally with <code style="font-family:'JetBrains Mono',monospace; background:var(--card-bg); padding:2px 6px; border-radius:4px; border:1px solid var(--border);">streamlit run app.py</code>
+    </p>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── Features ────────────────────────────────────────────────────────────── -->
+<section id="features" class="section">
+  <div class="container">
+    <div class="features-header">
+      <div class="section-label">What It Includes</div>
+      <h2 class="section-title">Five integrated modules</h2>
+      <p class="section-sub">Each module mirrors a deliverable a tech consultant would produce — from raw data through insights.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(79,142,247,0.12);">🔢</div>
+        <div class="feature-name">Synthetic Data Generator</div>
+        <div class="feature-desc">
+          Generates 24 months of realistic monthly financials — revenue, COGS, headcount,
+          operating expenses, cash balance — using NumPy with controlled noise and baked-in
+          problem signals like growth deceleration and cost surges.
+        </div>
+        <span class="feature-tag">src/data_generator.py</span>
+      </div>
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(0,200,150,0.12);">📐</div>
+        <div class="feature-name">KPI Engine</div>
+        <div class="feature-desc">
+          Computes all six key performance indicators from raw financial data using Pandas:
+          Gross Margin %, Revenue Growth MoM, Operating Expense Ratio,
+          Revenue per Employee, Burn Rate, and Runway.
+        </div>
+        <span class="feature-tag">src/kpi_engine.py</span>
+      </div>
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(245,166,35,0.12);">🚦</div>
+        <div class="feature-name">RAG Benchmarking Layer</div>
+        <div class="feature-desc">
+          Compares each KPI against hardcoded SaaS SMB industry benchmarks (SaaS Capital,
+          OpenView, Bessemer) and assigns Red, Amber, or Green status — the same framework
+          used in real consulting engagements.
+        </div>
+        <span class="feature-tag">src/benchmarks.py</span>
+      </div>
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(232,69,69,0.12);">💬</div>
+        <div class="feature-name">Consultant Findings</div>
+        <div class="feature-desc">
+          Auto-generates 3–5 plain-English insights from RAG results and 6-month trend data,
+          prioritized Red → Amber → Green. Each finding includes a headline, analysis, and
+          a concrete recommendation — mimicking a real advisory deliverable.
+        </div>
+        <span class="feature-tag">src/insights.py</span>
+      </div>
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(79,142,247,0.12);">📊</div>
+        <div class="feature-name">Interactive Streamlit Dashboard</div>
+        <div class="feature-desc">
+          A five-section dark-themed dashboard with company selector, date range slider,
+          tabbed Plotly charts (time-series, bar, waterfall, radar), a color-coded
+          KPI scorecard table, and the auto-generated findings panel.
+        </div>
+        <span class="feature-tag">app.py</span>
+      </div>
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(0,200,150,0.12);">💧</div>
+        <div class="feature-name">Cash Flow & Burn Analysis</div>
+        <div class="feature-desc">
+          A P&amp;L waterfall chart for the latest month (Revenue → COGS → OpEx → Net Income)
+          paired with a dual-axis cash balance / net cash flow trend — the view a CFO or
+          investor would look at first.
+        </div>
+        <span class="feature-tag">Section 05 in app.py</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── Companies ───────────────────────────────────────────────────────────── -->
+<section id="companies" class="section" style="background:var(--navy-light); padding:96px 0;">
+  <div class="container">
+    <div class="section-label">Fictional Profiles</div>
+    <h2 class="section-title">Two companies, two stories</h2>
+    <p class="section-sub">Each company has a distinct financial profile with problem signals baked in — so the dashboard always surfaces meaningful findings.</p>
+
+    <div class="companies-grid">
+      <!-- NovaSaaS -->
+      <div class="company-card fade-up">
+        <div class="company-header">
+          <div>
+            <div class="company-name">NovaSaaS</div>
+            <div class="company-industry">SaaS / Project Management</div>
+          </div>
+          <div class="company-founded">Founded 2020</div>
+        </div>
+        <p class="company-desc">
+          B2B project management SaaS with healthy early growth that decelerates over 24 months.
+          Starts with strong 74% gross margin but faces COGS creep and a marketing spend surge
+          at month 14 that compresses the OpEx ratio into the red zone.
+        </p>
+        <div class="company-signals">
+          <div class="signal-title">Baked-in problem signals</div>
+          <div class="signal-item"><div class="signal-dot"></div>Revenue growth decelerates from ~5.5% → ~2% MoM</div>
+          <div class="signal-item"><div class="signal-dot"></div>COGS ratio drifts +0.25pp/month (infrastructure scaling)</div>
+          <div class="signal-item"><div class="signal-dot"></div>$28K marketing spend surge at month 14</div>
+          <div class="signal-item"><div class="signal-dot"></div>Hiring sprints at months 6, 12, 18</div>
+        </div>
+        <div class="rag-summary">
+          <span class="rag-summary-label">Final RAG (Dec 2024):</span>
+          <span class="rag-badge badge-green">1 GREEN</span>
+          <span class="rag-badge badge-amber">1 AMBER</span>
+          <span class="rag-badge badge-red">4 RED</span>
+        </div>
+      </div>
+
+      <!-- CloudForge -->
+      <div class="company-card fade-up">
+        <div class="company-header">
+          <div>
+            <div class="company-name">CloudForge</div>
+            <div class="company-industry">SaaS / DevOps</div>
+          </div>
+          <div class="company-founded">Founded 2021</div>
+        </div>
+        <p class="company-desc">
+          DevOps tooling SaaS pursuing aggressive growth with thin margins from day one.
+          Revenue grows faster early on (~7% MoM) but decelerates sharply. High cost-per-head
+          and a large sales surge at month 10 drain cash — runway hits zero by end of period.
+        </p>
+        <div class="company-signals">
+          <div class="signal-title">Baked-in problem signals</div>
+          <div class="signal-item"><div class="signal-dot"></div>COGS ratio starts at 38% and drifts rapidly higher</div>
+          <div class="signal-item"><div class="signal-dot"></div>$45K sales/marketing surge at month 10</div>
+          <div class="signal-item"><div class="signal-dot"></div>$11K cost-per-head (vs $9.5K for NovaSaaS)</div>
+          <div class="signal-item"><div class="signal-dot"></div>Cash runway reaches 0 by December 2024</div>
+        </div>
+        <div class="rag-summary">
+          <span class="rag-summary-label">Final RAG (Dec 2024):</span>
+          <span class="rag-badge badge-green">0 GREEN</span>
+          <span class="rag-badge badge-amber">0 AMBER</span>
+          <span class="rag-badge badge-red">6 RED</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── Benchmarks ──────────────────────────────────────────────────────────── -->
+<section id="benchmarks" class="section">
+  <div class="container">
+    <div class="section-label">Industry Standards</div>
+    <h2 class="section-title">KPI benchmarks at a glance</h2>
+    <p class="section-sub">Thresholds sourced from SaaS Capital, OpenView Partners, and Bessemer's State of the Cloud reports.</p>
+
+    <div class="table-wrap fade-up" style="margin-top:40px;">
+      <table class="bench-table">
+        <thead>
+          <tr>
+            <th>KPI</th>
+            <th>🟢 Green</th>
+            <th>🟡 Amber</th>
+            <th>🔴 Red</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="kpi-cell">Gross Margin %</td>
+            <td class="bench-cell-green">≥ 70%</td>
+            <td class="bench-cell-amber">60 – 70%</td>
+            <td class="bench-cell-red">&lt; 60%</td>
+            <td class="bench-source">SaaS Capital / Bessemer</td>
+          </tr>
+          <tr>
+            <td class="kpi-cell">Revenue Growth (MoM)</td>
+            <td class="bench-cell-green">≥ 5%</td>
+            <td class="bench-cell-amber">2 – 5%</td>
+            <td class="bench-cell-red">&lt; 2%</td>
+            <td class="bench-source">OpenView SaaS benchmarks</td>
+          </tr>
+          <tr>
+            <td class="kpi-cell">OpEx Ratio</td>
+            <td class="bench-cell-green">≤ 40%</td>
+            <td class="bench-cell-amber">40 – 55%</td>
+            <td class="bench-cell-red">&gt; 55%</td>
+            <td class="bench-source">SaaS Capital</td>
+          </tr>
+          <tr>
+            <td class="kpi-cell">Revenue / Employee</td>
+            <td class="bench-cell-green">≥ $15K / mo</td>
+            <td class="bench-cell-amber">$10K – $15K</td>
+            <td class="bench-cell-red">&lt; $10K</td>
+            <td class="bench-source">OpenView productivity benchmarks</td>
+          </tr>
+          <tr>
+            <td class="kpi-cell">Burn Rate</td>
+            <td class="bench-cell-green">Profitable</td>
+            <td class="bench-cell-amber">&lt; $30K / mo burn</td>
+            <td class="bench-cell-red">≥ $30K / mo burn</td>
+            <td class="bench-source">General startup guidance</td>
+          </tr>
+          <tr>
+            <td class="kpi-cell">Runway</td>
+            <td class="bench-cell-green">≥ 18 months</td>
+            <td class="bench-cell-amber">12 – 18 months</td>
+            <td class="bench-cell-red">&lt; 12 months</td>
+            <td class="bench-source">Standard VC guidance</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── Tech Stack ──────────────────────────────────────────────────────────── -->
+<section id="stack" class="section" style="background:var(--navy-light); padding:96px 0;">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:0;">
+      <div class="section-label">Tech Stack</div>
+      <h2 class="section-title">Built entirely in Python</h2>
+      <p class="section-sub" style="margin:0 auto 0;">
+        No JavaScript frameworks. No BI tool licenses. Pure Python from data generation through
+        visualization — the kind of stack a scrappy consulting team actually uses.
+      </p>
+    </div>
+
+    <div class="stack-grid fade-up">
+      <div class="stack-card">
+        <div class="stack-icon">🐍</div>
+        <div class="stack-name">Python 3.11</div>
+        <div class="stack-role">Core language</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🐼</div>
+        <div class="stack-name">Pandas 2.2</div>
+        <div class="stack-role">KPI computation &amp; data wrangling</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">⚡</div>
+        <div class="stack-name">Streamlit 1.32</div>
+        <div class="stack-role">Interactive dashboard UI</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">📈</div>
+        <div class="stack-name">Plotly 5.20</div>
+        <div class="stack-role">Time-series, waterfall &amp; radar charts</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🔢</div>
+        <div class="stack-name">NumPy 1.26</div>
+        <div class="stack-role">Synthetic data generation with noise</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── Skills ──────────────────────────────────────────────────────────────── -->
+<section id="skills" class="section">
+  <div class="container">
+    <div class="section-label">Portfolio Value</div>
+    <h2 class="section-title">What this demonstrates</h2>
+    <p class="section-sub">Each module maps directly to a skill a tech consulting or data engineering role would look for.</p>
+
+    <div class="skills-grid" style="margin-top:40px;">
+      <div class="skill-card fade-up">
+        <div class="skill-icon">🏗️</div>
+        <div>
+          <div class="skill-name">Data Engineering</div>
+          <div class="skill-desc">Synthetic data generation with controlled noise parameters, seeded randomness for reproducibility, and embedded problem signals designed to surface analytically interesting findings.</div>
+        </div>
+      </div>
+      <div class="skill-card fade-up">
+        <div class="skill-icon">📊</div>
+        <div>
+          <div class="skill-name">Financial Analytics</div>
+          <div class="skill-desc">Translating raw financial line items (revenue, COGS, OpEx, cash) into the 6 KPIs most relevant to SaaS SMB investors and operators — using standard Pandas computation pipelines.</div>
+        </div>
+      </div>
+      <div class="skill-card fade-up">
+        <div class="skill-icon">🚦</div>
+        <div>
+          <div class="skill-name">Business Intelligence</div>
+          <div class="skill-desc">RAG status framework with directional benchmark logic (higher-is-better vs lower-is-better KPIs), scored against real SaaS Capital and OpenView industry thresholds.</div>
+        </div>
+      </div>
+      <div class="skill-card fade-up">
+        <div class="skill-icon">💬</div>
+        <div>
+          <div class="skill-name">Insight Generation</div>
+          <div class="skill-desc">Rule-based narrative engine that reads RAG status, computes 6-month trends, and outputs consultant-style plain-English findings prioritized by severity — no LLM required.</div>
+        </div>
+      </div>
+      <div class="skill-card fade-up">
+        <div class="skill-icon">🎨</div>
+        <div>
+          <div class="skill-name">Data Visualization</div>
+          <div class="skill-desc">Multi-chart Plotly dashboard: area line charts, RAG-colored bar charts, waterfall P&amp;L, dual-axis cash flow, and a normalized radar chart — all with a consistent dark-theme layout.</div>
+        </div>
+      </div>
+      <div class="skill-card fade-up">
+        <div class="skill-icon">🧱</div>
+        <div>
+          <div class="skill-name">Software Architecture</div>
+          <div class="skill-desc">Clean modular project structure: data → kpi_engine → benchmarks → insights → app. Each layer is independently testable. Streamlit caching applied for performance.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ──────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">SMB Financial Health Dashboard</div>
+    <p class="footer-desc">
+      A tech consulting portfolio project demonstrating end-to-end analytical capability —
+      from raw data generation through KPI computation, benchmarking, and actionable narrative.
+    </p>
+    <div class="footer-links">
+      <a href="https://github.com/" id="footer-github">GitHub Repository</a>
+      <a href="#features">Features</a>
+      <a href="#companies">Companies</a>
+      <a href="#benchmarks">Benchmarks</a>
+      <a href="#stack">Tech Stack</a>
+    </div>
+    <div class="footer-copy">
+      All data is entirely synthetic. No real company is represented. &nbsp;·&nbsp;
+      Built with Python, Pandas, Streamlit, and Plotly.
+    </div>
+  </div>
+</footer>
+
+<!-- ── Scripts ─────────────────────────────────────────────────────────────── -->
+<script>
+  // Scroll fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Animated stat counters
+  function animateCounter(el) {
+    const target = parseInt(el.dataset.count, 10);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1200;
+    const step = target / (duration / 16);
+    let current = 0;
+    const timer = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = Math.floor(current) + suffix;
+      if (current >= target) clearInterval(timer);
+    }, 16);
+  }
+  const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        document.querySelectorAll('[data-count]').forEach(animateCounter);
+        heroObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  const heroSection = document.getElementById('hero');
+  if (heroSection) heroObserver.observe(heroSection);
+
+  // Active nav link on scroll
+  const sections = ['hero','features','preview','companies','benchmarks','stack','skills'];
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && window.scrollY >= el.offsetTop - 80) current = id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }, { passive: true });
+
+  // Mobile nav toggle
+  function toggleMobileNav() {
+    const links = document.querySelector('.nav-links');
+    if (!links) return;
+    const isOpen = links.style.display === 'flex';
+    links.style.display = isOpen ? '' : 'flex';
+    links.style.flexDirection = 'column';
+    links.style.position = 'absolute';
+    links.style.top = '60px';
+    links.style.left = '0';
+    links.style.right = '0';
+    links.style.background = 'rgba(11,20,55,0.97)';
+    links.style.padding = '16px 28px';
+    links.style.borderBottom = '1px solid #1e2d6b';
+    if (isOpen) links.style.display = '';
+  }
+</script>
+
+</body>
+</html>
