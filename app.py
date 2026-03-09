@@ -267,26 +267,48 @@ with col_status:
 
 st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
 
-with st.expander("👋 New here? Click to learn how to use this dashboard", expanded=True):
-    st.markdown(f"""
-**What this is:** A simulated financial health review for two fictional SaaS companies.
-Select a company from the sidebar to explore its metrics. Use the month slider to adjust the analysis window.
-
-**The two companies:**
-- **NovaSaaS** — a healthy, profitable B2B SaaS with strong margins and disciplined growth. Use this to see what a well-run company looks like.
-- **CloudForge** — a distressed company burning cash aggressively. Use this to see how the dashboard surfaces financial risk.
-
-**RAG status (Red / Amber / Green):** Each KPI is scored against SaaS SMB industry benchmarks.
-Green = healthy, Amber = watch closely, Red = action required.
-The overall health badge (top right) reflects the combined picture.
-
-**Sections:**
-1. **Company Overview** — snapshot of the 5 most important numbers right now
-2. **Financial Trends** — 24-month charts across revenue, costs, and headcount
-3. **KPI Scorecard** — six benchmarked KPIs with RAG status + a radar chart showing the health profile at a glance
-4. **Consultant Findings** — auto-generated narrative insights, sorted by severity
-5. **Cash Flow & Burn** — P&L waterfall and cash runway chart
-""")
+st.markdown(f"""
+<div style="background:rgba(79,142,247,0.06); border:1px solid rgba(79,142,247,0.25);
+            border-left:3px solid {ACCENT}; border-radius:8px; padding:18px 24px; margin-bottom:4px;">
+  <div style="font-size:11px; font-weight:700; color:{ACCENT}; letter-spacing:1.8px;
+              text-transform:uppercase; margin-bottom:14px;">Dashboard Guide</div>
+  <div style="display:flex; gap:40px; flex-wrap:wrap;">
+    <div style="flex:2; min-width:220px;">
+      <div style="font-size:13px; color:{TEXT_WHITE}; font-weight:600; margin-bottom:4px;">What this is</div>
+      <div style="font-size:13px; color:{TEXT_MUTED}; line-height:1.7; margin-bottom:12px;">
+        A simulated financial health review for two fictional SaaS companies. Select a company
+        in the sidebar and use the month slider to adjust the analysis window.
+      </div>
+      <div style="font-size:13px; color:{TEXT_WHITE}; font-weight:600; margin-bottom:4px;">RAG Status</div>
+      <div style="font-size:13px; color:{TEXT_MUTED}; line-height:1.7;">
+        Each KPI is scored against SaaS SMB benchmarks.
+        <span style="color:{TEAL}; font-weight:600;">Green</span> = healthy &nbsp;·&nbsp;
+        <span style="color:{AMBER}; font-weight:600;">Amber</span> = watch closely &nbsp;·&nbsp;
+        <span style="color:{RED}; font-weight:600;">Red</span> = action required.
+      </div>
+    </div>
+    <div style="flex:1.5; min-width:200px;">
+      <div style="font-size:13px; color:{TEXT_WHITE}; font-weight:600; margin-bottom:8px;">The two companies</div>
+      <div style="font-size:13px; color:{TEXT_MUTED}; line-height:1.8;">
+        <span style="color:{TEAL}; font-weight:600;">NovaSaaS</span> — healthy, profitable,
+        strong margins. See what good looks like.<br>
+        <span style="color:{RED}; font-weight:600;">CloudForge</span> — burning cash,
+        thin margins. See how risk surfaces.
+      </div>
+    </div>
+    <div style="flex:1.5; min-width:180px;">
+      <div style="font-size:13px; color:{TEXT_WHITE}; font-weight:600; margin-bottom:8px;">Sections</div>
+      <div style="font-size:12px; color:{TEXT_MUTED}; line-height:2.0;">
+        01 · Company Overview<br>
+        02 · Financial Trends<br>
+        03 · KPI Scorecard<br>
+        04 · Consultant Findings<br>
+        05 · Cash Flow &amp; Burn
+      </div>
+    </div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ── Section 1: Company Overview ───────────────────────────────────────────────
 st.markdown('<div class="section-header">01 · Company Overview</div>', unsafe_allow_html=True)
