@@ -56,7 +56,7 @@ st.markdown(f"""
     height: 100%;
   }}
   .metric-label {{
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 1.2px;
     text-transform: uppercase;
@@ -69,7 +69,7 @@ st.markdown(f"""
     color: {TEXT_WHITE};
     line-height: 1.1;
   }}
-  .metric-sub {{ font-size: 12px; color: {TEXT_MUTED}; margin-top: 6px; }}
+  .metric-sub {{ font-size: 13px; color: {TEXT_MUTED}; margin-top: 6px; }}
   .metric-delta-pos {{ color: {TEAL}; font-weight: 600; }}
   .metric-delta-neg {{ color: {RED}; font-weight: 600; }}
 
@@ -128,11 +128,11 @@ st.markdown(f"""
   .insight-Green {{ border-color: {TEAL};  background: rgba(0,200,150,0.06); }}
   .insight-Amber {{ border-color: {AMBER}; background: rgba(245,166,35,0.06); }}
   .insight-Red   {{ border-color: {RED};   background: rgba(232,69,69,0.06); }}
-  .insight-title {{ font-weight: 700; font-size: 14px; margin-bottom: 6px; }}
+  .insight-title {{ font-weight: 700; font-size: 15px; margin-bottom: 6px; }}
   .insight-title-Green {{ color: {TEAL}; }}
   .insight-title-Amber {{ color: {AMBER}; }}
   .insight-title-Red   {{ color: {RED}; }}
-  .insight-body {{ font-size: 13px; color: {TEXT_MUTED}; line-height: 1.6; }}
+  .insight-body {{ font-size: 14px; color: {TEXT_MUTED}; line-height: 1.6; }}
 
   .styled-divider {{ border: none; border-top: 1px solid {BORDER}; margin: 32px 0; }}
 </style>
@@ -142,16 +142,16 @@ st.markdown(f"""
 CHART_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="Inter, Segoe UI, sans-serif", color=TEXT_WHITE, size=12),
+    font=dict(family="Inter, Segoe UI, sans-serif", color=TEXT_WHITE, size=13),
     margin=dict(l=12, r=12, t=40, b=12),
     legend=dict(
         bgcolor="rgba(0,0,0,0)",
         bordercolor=BORDER,
         borderwidth=1,
-        font=dict(size=11),
+        font=dict(size=12),
     ),
-    xaxis=dict(gridcolor=BORDER, linecolor=BORDER, tickfont=dict(size=10, color=TEXT_MUTED), showgrid=False),
-    yaxis=dict(gridcolor="#1a2460", linecolor=BORDER, tickfont=dict(size=10, color=TEXT_MUTED)),
+    xaxis=dict(gridcolor=BORDER, linecolor=BORDER, tickfont=dict(size=11, color=TEXT_MUTED), showgrid=False),
+    yaxis=dict(gridcolor="#1a2460", linecolor=BORDER, tickfont=dict(size=11, color=TEXT_MUTED)),
     hovermode="x unified",
 )
 
@@ -184,7 +184,7 @@ with st.sidebar:
     st.markdown(f"""
     <div style="padding: 8px 0 20px 0;">
       <div style="font-size:18px; font-weight:800; color:{TEXT_WHITE};">SMB Financial</div>
-      <div style="font-size:11px; color:{TEXT_MUTED}; letter-spacing:1.2px; text-transform:uppercase;">Health Dashboard</div>
+      <div style="font-size:12px; color:{TEXT_MUTED}; letter-spacing:1.2px; text-transform:uppercase;">Health Dashboard</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -196,9 +196,9 @@ with st.sidebar:
     st.markdown(f"""
     <div style="background:{CARD_BG}; border:1px solid {BORDER}; border-radius:10px; padding:14px 16px; margin-top:8px;">
       <div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px;">Company Profile</div>
-      <div style="font-size:12px; color:{TEXT_WHITE}; margin-bottom:4px;">{profile['description']}</div>
-      <div style="font-size:11px; color:{TEXT_MUTED}; margin-top:8px;">Industry: {profile['industry']}</div>
-      <div style="font-size:11px; color:{TEXT_MUTED};">Founded: {profile['founded']}</div>
+      <div style="font-size:13px; color:{TEXT_WHITE}; margin-bottom:4px;">{profile['description']}</div>
+      <div style="font-size:12px; color:{TEXT_MUTED}; margin-top:8px;">Industry: {profile['industry']}</div>
+      <div style="font-size:12px; color:{TEXT_MUTED};">Founded: {profile['founded']}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -210,7 +210,7 @@ with st.sidebar:
 
     st.markdown(f"""
     <div style="margin-top:32px; padding-top:20px; border-top:1px solid {BORDER};">
-      <div style="font-size:10px; color:{TEXT_MUTED}; line-height:1.6;">
+      <div style="font-size:12px; color:{TEXT_MUTED}; line-height:1.6;">
         Built with Python · Pandas · Streamlit · Plotly<br>
         Data is entirely synthetic for demo purposes.
       </div>
@@ -404,13 +404,13 @@ with col_score:
         color = RAG_COLOR[row['Status']]
         bg    = RAG_BG[row['Status']]
         c1, c2, c3, c4 = st.columns(COLS)
-        c1.markdown(f"**{row['KPI']}**  \n<span style='font-size:11px; color:{TEXT_MUTED};'>{row['_description']}</span>",
+        c1.markdown(f"**{row['KPI']}**  \n<span style='font-size:13px; color:{TEXT_MUTED};'>{row['_description']}</span>",
                     unsafe_allow_html=True)
         c2.markdown(f"**{row['Value']}**")
-        c3.markdown(f"<span style='font-size:12px; color:{TEXT_MUTED};'>{row['Benchmark']}</span>",
+        c3.markdown(f"<span style='font-size:13px; color:{TEXT_MUTED};'>{row['Benchmark']}</span>",
                     unsafe_allow_html=True)
         c4.markdown(f"<span style='background:{bg}; color:{color}; border:1px solid {color}; "
-                    f"padding:3px 8px; border-radius:4px; font-size:11px; font-weight:700;'>"
+                    f"padding:3px 8px; border-radius:4px; font-size:12px; font-weight:700;'>"
                     f"{row['Status'].upper()}</span>", unsafe_allow_html=True)
         st.divider()
 
