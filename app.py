@@ -388,42 +388,39 @@ st.markdown('<div class="section-header">03 · KPI Scorecard</div>', unsafe_allo
 col_score, col_radar = st.columns([3, 2])
 
 with col_score:
-    TD = f"padding:10px 14px; border-bottom:1px solid {BORDER}; vertical-align:middle;"
-    TH = f"padding:8px 14px; background:{NAVY_LIGHT}; color:{TEXT_MUTED}; font-size:11px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; border-bottom:1px solid {BORDER};"
     BADGE_STYLES = {
         "Green": f"background:rgba(0,200,150,0.15); color:{TEAL}; border:1px solid {TEAL};",
         "Amber": f"background:rgba(245,166,35,0.15); color:{AMBER}; border:1px solid {AMBER};",
         "Red":   f"background:rgba(232,69,69,0.15);  color:{RED};  border:1px solid {RED};",
     }
-    rows_html = ""
+    ROW  = f"display:flex; align-items:center; padding:10px 14px; border-bottom:1px solid {BORDER};"
+    HEAD = f"display:flex; align-items:center; padding:8px 14px; background:{NAVY_LIGHT}; border-bottom:1px solid {BORDER}; border-radius:6px 6px 0 0;"
+    HL   = f"font-size:11px; color:{TEXT_MUTED}; font-weight:600; text-transform:uppercase; letter-spacing:.8px;"
+    rows_html = f"""
+    <div style="{HEAD}">
+      <div style="{HL} flex:3;">KPI</div>
+      <div style="{HL} flex:1.5;">Value</div>
+      <div style="{HL} flex:2.5;">Benchmark</div>
+      <div style="{HL} flex:1.5;">Status</div>
+    </div>
+    """
     for row in scorecard:
-        badge_style = BADGE_STYLES.get(row['Status'], "")
+        badge = BADGE_STYLES.get(row['Status'], "")
         rows_html += f"""
-        <tr>
-          <td style="{TD}">
-            <strong style="color:{TEXT_WHITE}; font-size:13px;">{row['KPI']}</strong><br>
-            <span style="font-size:11px; color:{TEXT_MUTED};">{row['_description']}</span>
-          </td>
-          <td style="{TD} font-weight:700; font-size:15px; color:{TEXT_WHITE};">{row['Value']}</td>
-          <td style="{TD} font-size:12px; color:{TEXT_MUTED};">{row['Benchmark']}</td>
-          <td style="{TD}">
-            <span style="{badge_style} padding:3px 10px; border-radius:4px; font-size:11px; font-weight:700; letter-spacing:.6px;">
-              {row['Status'].upper()}
-            </span>
-          </td>
-        </tr>
+    <div style="{ROW}">
+      <div style="flex:3;">
+        <div style="font-weight:700; font-size:13px; color:{TEXT_WHITE};">{row['KPI']}</div>
+        <div style="font-size:11px; color:{TEXT_MUTED}; margin-top:2px;">{row['_description']}</div>
+      </div>
+      <div style="flex:1.5; font-weight:700; font-size:15px; color:{TEXT_WHITE};">{row['Value']}</div>
+      <div style="flex:2.5; font-size:12px; color:{TEXT_MUTED};">{row['Benchmark']}</div>
+      <div style="flex:1.5;">
+        <span style="{badge} padding:3px 10px; border-radius:4px; font-size:11px; font-weight:700; letter-spacing:.6px;">{row['Status'].upper()}</span>
+      </div>
+    </div>
         """
-    st.markdown(f"""
-    <table style="width:100%; border-collapse:collapse; font-size:13px;">
-      <thead><tr>
-        <th style="{TH} width:35%;">KPI</th>
-        <th style="{TH} width:18%;">Value</th>
-        <th style="{TH} width:32%;">Benchmark</th>
-        <th style="{TH} width:15%;">Status</th>
-      </tr></thead>
-      <tbody>{rows_html}</tbody>
-    </table>
-    """, unsafe_allow_html=True)
+    st.markdown(f'<div style="border:1px solid {BORDER}; border-radius:8px; overflow:hidden;">{rows_html}</div>',
+                unsafe_allow_html=True)
 
 with col_radar:
     def normalize_kpi(key, value):
