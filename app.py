@@ -511,8 +511,8 @@ with col_wf:
     fig_wf.update_layout(
         **CHART_LAYOUT, height=320, showlegend=False,
         title=dict(text=f"P&L Waterfall — {latest['month_label']}", font=dict(size=13, color=TEXT_MUTED)),
-        yaxis=dict(tickprefix="$", tickformat=",.0f", gridcolor="#1a2460"),
     )
+    fig_wf.update_layout(yaxis=dict(tickprefix="$", tickformat=",.0f", gridcolor="#1a2460"))
     st.plotly_chart(fig_wf, use_container_width=True, config={"displayModeBar": False})
 
 with col_cash:
@@ -532,6 +532,8 @@ with col_cash:
     fig_cash.update_layout(
         **CHART_LAYOUT, height=320, showlegend=True,
         title=dict(text="Cash Balance & Monthly Net Flow", font=dict(size=13, color=TEXT_MUTED)),
+    )
+    fig_cash.update_layout(
         yaxis=dict(tickprefix="$", tickformat=",.0f", title="Cash Balance", gridcolor="#1a2460"),
         yaxis2=dict(tickprefix="$", tickformat=",.0f", title="Net Cash Flow",
                     overlaying="y", side="right", showgrid=False,
