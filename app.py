@@ -388,39 +388,31 @@ st.markdown('<div class="section-header">03 · KPI Scorecard</div>', unsafe_allo
 col_score, col_radar = st.columns([3, 2])
 
 with col_score:
-    BADGE_STYLES = {
-        "Green": f"background:rgba(0,200,150,0.15); color:{TEAL}; border:1px solid {TEAL};",
-        "Amber": f"background:rgba(245,166,35,0.15); color:{AMBER}; border:1px solid {AMBER};",
-        "Red":   f"background:rgba(232,69,69,0.15);  color:{RED};  border:1px solid {RED};",
-    }
-    ROW  = f"display:flex; align-items:center; padding:10px 14px; border-bottom:1px solid {BORDER};"
-    HEAD = f"display:flex; align-items:center; padding:8px 14px; background:{NAVY_LIGHT}; border-bottom:1px solid {BORDER}; border-radius:6px 6px 0 0;"
-    HL   = f"font-size:11px; color:{TEXT_MUTED}; font-weight:600; text-transform:uppercase; letter-spacing:.8px;"
-    rows_html = f"""
-    <div style="{HEAD}">
-      <div style="{HL} flex:3;">KPI</div>
-      <div style="{HL} flex:1.5;">Value</div>
-      <div style="{HL} flex:2.5;">Benchmark</div>
-      <div style="{HL} flex:1.5;">Status</div>
-    </div>
-    """
+    RAG_COLOR = {"Green": TEAL, "Amber": AMBER, "Red": RED}
+    RAG_BG    = {"Green": "rgba(0,200,150,0.15)", "Amber": "rgba(245,166,35,0.15)", "Red": "rgba(232,69,69,0.15)"}
+    COLS      = [3, 1.5, 2.5, 1.5]
+    hstyle    = f"font-size:11px; color:{TEXT_MUTED}; font-weight:600; text-transform:uppercase; letter-spacing:.8px; margin:0;"
+
+    h1, h2, h3, h4 = st.columns(COLS)
+    h1.markdown(f"<p style='{hstyle}'>KPI</p>", unsafe_allow_html=True)
+    h2.markdown(f"<p style='{hstyle}'>Value</p>", unsafe_allow_html=True)
+    h3.markdown(f"<p style='{hstyle}'>Benchmark</p>", unsafe_allow_html=True)
+    h4.markdown(f"<p style='{hstyle}'>Status</p>", unsafe_allow_html=True)
+    st.divider()
+
     for row in scorecard:
-        badge = BADGE_STYLES.get(row['Status'], "")
-        rows_html += f"""
-    <div style="{ROW}">
-      <div style="flex:3;">
-        <div style="font-weight:700; font-size:13px; color:{TEXT_WHITE};">{row['KPI']}</div>
-        <div style="font-size:11px; color:{TEXT_MUTED}; margin-top:2px;">{row['_description']}</div>
-      </div>
-      <div style="flex:1.5; font-weight:700; font-size:15px; color:{TEXT_WHITE};">{row['Value']}</div>
-      <div style="flex:2.5; font-size:12px; color:{TEXT_MUTED};">{row['Benchmark']}</div>
-      <div style="flex:1.5;">
-        <span style="{badge} padding:3px 10px; border-radius:4px; font-size:11px; font-weight:700; letter-spacing:.6px;">{row['Status'].upper()}</span>
-      </div>
-    </div>
-        """
-    st.markdown(f'<div style="border:1px solid {BORDER}; border-radius:8px; overflow:hidden;">{rows_html}</div>',
-                unsafe_allow_html=True)
+        color = RAG_COLOR[row['Status']]
+        bg    = RAG_BG[row['Status']]
+        c1, c2, c3, c4 = st.columns(COLS)
+        c1.markdown(f"**{row['KPI']}**  \n<span style='font-size:11px; color:{TEXT_MUTED};'>{row['_description']}</span>",
+                    unsafe_allow_html=True)
+        c2.markdown(f"**{row['Value']}**")
+        c3.markdown(f"<span style='font-size:12px; color:{TEXT_MUTED};'>{row['Benchmark']}</span>",
+                    unsafe_allow_html=True)
+        c4.markdown(f"<span style='background:{bg}; color:{color}; border:1px solid {color}; "
+                    f"padding:3px 8px; border-radius:4px; font-size:11px; font-weight:700;'>"
+                    f"{row['Status'].upper()}</span>", unsafe_allow_html=True)
+        st.divider()
 
 with col_radar:
     def normalize_kpi(key, value):
