@@ -267,7 +267,7 @@ with col_status:
 
 st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
 
-with st.expander("How to use this dashboard", expanded=False):
+with st.expander("👋 New here? Click to learn how to use this dashboard", expanded=True):
     st.markdown(f"""
 **What this is:** A simulated financial health review for two fictional SaaS companies.
 Select a company from the sidebar to explore its metrics. Use the month slider to adjust the analysis window.
