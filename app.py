@@ -388,24 +388,38 @@ st.markdown('<div class="section-header">03 · KPI Scorecard</div>', unsafe_allo
 col_score, col_radar = st.columns([3, 2])
 
 with col_score:
+    TD = f"padding:10px 14px; border-bottom:1px solid {BORDER}; vertical-align:middle;"
+    TH = f"padding:8px 14px; background:{NAVY_LIGHT}; color:{TEXT_MUTED}; font-size:11px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; border-bottom:1px solid {BORDER};"
+    BADGE_STYLES = {
+        "Green": f"background:rgba(0,200,150,0.15); color:{TEAL}; border:1px solid {TEAL};",
+        "Amber": f"background:rgba(245,166,35,0.15); color:{AMBER}; border:1px solid {AMBER};",
+        "Red":   f"background:rgba(232,69,69,0.15);  color:{RED};  border:1px solid {RED};",
+    }
     rows_html = ""
     for row in scorecard:
+        badge_style = BADGE_STYLES.get(row['Status'], "")
         rows_html += f"""
         <tr>
-          <td><strong>{row['KPI']}</strong><br>
-              <span style="font-size:11px; color:{TEXT_MUTED};">{row['_description']}</span></td>
-          <td style="font-weight:700; font-size:15px;">{row['Value']}</td>
-          <td style="font-size:12px; color:{TEXT_MUTED};">{row['Benchmark']}</td>
-          <td><span class="rag-badge badge-{row['Status']}">{row['Status'].upper()}</span></td>
+          <td style="{TD}">
+            <strong style="color:{TEXT_WHITE}; font-size:13px;">{row['KPI']}</strong><br>
+            <span style="font-size:11px; color:{TEXT_MUTED};">{row['_description']}</span>
+          </td>
+          <td style="{TD} font-weight:700; font-size:15px; color:{TEXT_WHITE};">{row['Value']}</td>
+          <td style="{TD} font-size:12px; color:{TEXT_MUTED};">{row['Benchmark']}</td>
+          <td style="{TD}">
+            <span style="{badge_style} padding:3px 10px; border-radius:4px; font-size:11px; font-weight:700; letter-spacing:.6px;">
+              {row['Status'].upper()}
+            </span>
+          </td>
         </tr>
         """
     st.markdown(f"""
-    <table class="rag-table">
+    <table style="width:100%; border-collapse:collapse; font-size:13px;">
       <thead><tr>
-        <th style="width:35%;">KPI</th>
-        <th style="width:18%;">Current Value</th>
-        <th style="width:32%;">Benchmark</th>
-        <th style="width:15%;">Status</th>
+        <th style="{TH} width:35%;">KPI</th>
+        <th style="{TH} width:18%;">Value</th>
+        <th style="{TH} width:32%;">Benchmark</th>
+        <th style="{TH} width:15%;">Status</th>
       </tr></thead>
       <tbody>{rows_html}</tbody>
     </table>
