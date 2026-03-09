@@ -220,11 +220,11 @@ with st.sidebar:
 
 # ── Data Pipeline ─────────────────────────────────────────────────────────────
 @st.cache_data
-def load_data(company: str) -> pd.DataFrame:
+def load_data(company: str, v: str = "v2") -> pd.DataFrame:
     return calculate_kpis(generate_company_data(company))
 
 
-df_full = load_data(selected_company)
+df_full = load_data(selected_company, v="v2")
 df = df_full.tail(month_range).copy().reset_index(drop=True)
 kpis = get_latest_kpis(df)
 scorecard = build_scorecard(kpis)
