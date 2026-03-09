@@ -22,16 +22,16 @@ st.set_page_config(
 )
 
 # ── Design Tokens ─────────────────────────────────────────────────────────────
-NAVY       = "#0b1437"
-NAVY_LIGHT = "#131d4f"
-CARD_BG    = "#111936"
-BORDER     = "#1e2d6b"
-TEXT_WHITE = "#f0f4ff"
-TEXT_MUTED = "#8b95c9"
-ACCENT     = "#4f8ef7"
-TEAL       = "#00c896"
-AMBER      = "#f5a623"
-RED        = "#e84545"
+NAVY       = "#0d1117"   # near-black charcoal
+NAVY_LIGHT = "#161b22"   # sidebar / secondary bg
+CARD_BG    = "#1c2333"   # card surfaces
+BORDER     = "#30363d"   # neutral gray — no blue tint
+TEXT_WHITE = "#e6edf3"   # primary text
+TEXT_MUTED = "#8b949e"   # muted gray — neutral, not blue
+ACCENT     = "#3b82f6"   # clean blue — reserved for accent only
+TEAL       = "#00c896"   # RAG green (unchanged)
+AMBER      = "#f5a623"   # RAG amber (unchanged)
+RED        = "#e84545"   # RAG red (unchanged)
 
 # ── Global CSS ────────────────────────────────────────────────────────────────
 st.markdown(f"""
@@ -151,7 +151,7 @@ CHART_LAYOUT = dict(
         font=dict(size=12),
     ),
     xaxis=dict(gridcolor=BORDER, linecolor=BORDER, tickfont=dict(size=11, color=TEXT_MUTED), showgrid=False),
-    yaxis=dict(gridcolor="#1a2460", linecolor=BORDER, tickfont=dict(size=11, color=TEXT_MUTED)),
+    yaxis=dict(gridcolor="#21262d", linecolor=BORDER, tickfont=dict(size=11, color=TEXT_MUTED)),
     hovermode="x unified",
 )
 
@@ -559,7 +559,7 @@ with col_wf:
         **CHART_LAYOUT, height=320, showlegend=False,
         title=dict(text=f"P&L Waterfall — {latest['month_label']}", font=dict(size=13, color=TEXT_MUTED)),
     )
-    fig_wf.update_layout(yaxis=dict(tickprefix="$", tickformat=",.0f", gridcolor="#1a2460"))
+    fig_wf.update_layout(yaxis=dict(tickprefix="$", tickformat=",.0f", gridcolor="#21262d"))
     st.plotly_chart(fig_wf, use_container_width=True, config={"displayModeBar": False})
 
 with col_cash:
@@ -587,7 +587,7 @@ with col_cash:
             x=0.01, y=0.99, xanchor="left", yanchor="top",
             font=dict(size=12),
         ),
-        yaxis=dict(tickprefix="$", tickformat=",.0f", title="Cash Balance", gridcolor="#1a2460"),
+        yaxis=dict(tickprefix="$", tickformat=",.0f", title="Cash Balance", gridcolor="#21262d"),
         yaxis2=dict(tickprefix="$", tickformat=",.0f", title="Net Cash Flow",
                     overlaying="y", side="right", showgrid=False,
                     zeroline=True, zerolinecolor=BORDER),
