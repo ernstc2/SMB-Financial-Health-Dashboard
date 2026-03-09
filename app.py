@@ -56,7 +56,7 @@ st.markdown(f"""
     height: 100%;
   }}
   .metric-label {{
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     letter-spacing: 1.2px;
     text-transform: uppercase;
@@ -69,12 +69,12 @@ st.markdown(f"""
     color: {TEXT_WHITE};
     line-height: 1.1;
   }}
-  .metric-sub {{ font-size: 13px; color: {TEXT_MUTED}; margin-top: 6px; }}
+  .metric-sub {{ font-size: 14px; color: {TEXT_MUTED}; margin-top: 6px; }}
   .metric-delta-pos {{ color: {TEAL}; font-weight: 600; }}
   .metric-delta-neg {{ color: {RED}; font-weight: 600; }}
 
   .section-header {{
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
@@ -86,7 +86,7 @@ st.markdown(f"""
   }}
 
   .dash-title {{ font-size: 26px; font-weight: 800; color: {TEXT_WHITE}; letter-spacing: -0.3px; }}
-  .dash-subtitle {{ font-size: 13px; color: {TEXT_MUTED}; margin-top: 4px; }}
+  .dash-subtitle {{ font-size: 14px; color: {TEXT_MUTED}; margin-top: 4px; }}
 
   .rag-table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
   .rag-table th {{
@@ -196,9 +196,9 @@ with st.sidebar:
     st.markdown(f"""
     <div style="background:{CARD_BG}; border:1px solid {BORDER}; border-radius:10px; padding:14px 16px; margin-top:8px;">
       <div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px;">Company Profile</div>
-      <div style="font-size:13px; color:{TEXT_WHITE}; margin-bottom:4px;">{profile['description']}</div>
-      <div style="font-size:12px; color:{TEXT_MUTED}; margin-top:8px;">Industry: {profile['industry']}</div>
-      <div style="font-size:12px; color:{TEXT_MUTED};">Founded: {profile['founded']}</div>
+      <div style="font-size:14px; color:{TEXT_WHITE}; margin-bottom:4px;">{profile['description']}</div>
+      <div style="font-size:13px; color:{TEXT_MUTED}; margin-top:8px;">Industry: {profile['industry']}</div>
+      <div style="font-size:13px; color:{TEXT_MUTED};">Founded: {profile['founded']}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -210,7 +210,7 @@ with st.sidebar:
 
     st.markdown(f"""
     <div style="margin-top:32px; padding-top:20px; border-top:1px solid {BORDER};">
-      <div style="font-size:12px; color:{TEXT_MUTED}; line-height:1.6;">
+      <div style="font-size:13px; color:{TEXT_MUTED}; line-height:1.6;">
         Built with Python · Pandas · Streamlit · Plotly<br>
         Data is entirely synthetic for demo purposes.
       </div>
@@ -254,12 +254,12 @@ with col_status:
     r, g, b = tuple(int(overall_color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
     st.markdown(f"""
     <div style="text-align:right; padding-top:6px;">
-      <div style="font-size:11px; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px;">Overall Health</div>
+      <div style="font-size:13px; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px;">Overall Health</div>
       <div style="display:inline-block; background:rgba({r},{g},{b},0.15);
            border:1px solid {overall_color}; border-radius:8px; padding:8px 18px;">
         <span style="font-size:20px; font-weight:800; color:{overall_color};">{overall_status.upper()}</span>
       </div>
-      <div style="font-size:11px; color:{TEXT_MUTED}; margin-top:6px;">
+      <div style="font-size:13px; color:{TEXT_MUTED}; margin-top:6px;">
         {rag_counts['Green']}G · {rag_counts['Amber']}A · {rag_counts['Red']}R
       </div>
     </div>
