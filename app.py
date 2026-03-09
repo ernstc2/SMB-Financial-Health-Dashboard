@@ -36,6 +36,8 @@ RED        = "#e84545"   # RAG red (unchanged)
 # ── Global CSS ────────────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap');
+
   html, body, [data-testid="stAppViewContainer"] {{
     background-color: {NAVY};
     color: {TEXT_WHITE};
@@ -48,93 +50,94 @@ st.markdown(f"""
   [data-testid="stSidebar"] * {{ color: {TEXT_WHITE} !important; }}
   #MainMenu, footer, header {{ visibility: hidden; }}
 
+  /* ── Metric Cards ── */
   .metric-card {{
     background: {CARD_BG};
     border: 1px solid {BORDER};
     border-radius: 12px;
-    padding: 20px 24px;
+    padding: 22px 24px 18px;
     height: 100%;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    cursor: default;
+  }}
+  .metric-card:hover {{
+    border-color: rgba(59,130,246,0.5);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
   }}
   .metric-label {{
-    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: 1.2px;
+    letter-spacing: 1.4px;
     text-transform: uppercase;
     color: {TEXT_MUTED};
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }}
   .metric-value {{
-    font-size: 28px;
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-size: 30px;
     font-weight: 700;
     color: {TEXT_WHITE};
     line-height: 1.1;
+    letter-spacing: -0.5px;
   }}
-  .metric-sub {{ font-size: 14px; color: {TEXT_MUTED}; margin-top: 6px; }}
+  .metric-sub {{ font-size: 13px; color: {TEXT_MUTED}; margin-top: 8px; }}
   .metric-delta-pos {{ color: {TEAL}; font-weight: 600; }}
   .metric-delta-neg {{ color: {RED}; font-weight: 600; }}
 
+  /* ── Section Headers ── */
   .section-header {{
-    font-size: 14px;
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: {ACCENT};
-    padding-bottom: 8px;
+    padding: 0 0 10px 14px;
     border-bottom: 1px solid {BORDER};
-    margin-bottom: 20px;
+    border-left: 3px solid {ACCENT};
+    margin-bottom: 24px;
     margin-top: 8px;
   }}
 
-  .dash-title {{ font-size: 26px; font-weight: 800; color: {TEXT_WHITE}; letter-spacing: -0.3px; }}
-  .dash-subtitle {{ font-size: 14px; color: {TEXT_MUTED}; margin-top: 4px; }}
-
-  .rag-table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
-  .rag-table th {{
-    background: {NAVY_LIGHT};
-    color: {TEXT_MUTED};
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-size: 11px;
-    padding: 10px 14px;
-    border-bottom: 1px solid {BORDER};
-    text-align: left;
-  }}
-  .rag-table td {{
-    padding: 11px 14px;
-    border-bottom: 1px solid {BORDER};
-    color: {TEXT_WHITE};
-    vertical-align: middle;
-  }}
-  .rag-table tr:last-child td {{ border-bottom: none; }}
-  .rag-table tr:hover td {{ background: rgba(79,142,247,0.05); }}
-  .rag-badge {{
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
+  /* ── Dashboard Title ── */
+  .dash-title {{
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-size: 28px;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    color: {TEXT_WHITE};
+    letter-spacing: -0.5px;
   }}
-  .badge-Green {{ background: rgba(0,200,150,0.15);  color: #00c896; border: 1px solid #00c896; }}
-  .badge-Amber {{ background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid #f5a623; }}
-  .badge-Red   {{ background: rgba(232,69,69,0.15);  color: #e84545; border: 1px solid #e84545; }}
+  .dash-subtitle {{ font-size: 14px; color: {TEXT_MUTED}; margin-top: 6px; line-height: 1.5; }}
 
+  /* ── Insight Cards ── */
   .insight-card {{
-    border-radius: 10px;
-    padding: 16px 20px;
+    border-radius: 8px;
+    padding: 18px 22px;
     margin-bottom: 12px;
+    border: 1px solid {BORDER};
     border-left: 4px solid;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }}
-  .insight-Green {{ border-color: {TEAL};  background: rgba(0,200,150,0.06); }}
-  .insight-Amber {{ border-color: {AMBER}; background: rgba(245,166,35,0.06); }}
-  .insight-Red   {{ border-color: {RED};   background: rgba(232,69,69,0.06); }}
-  .insight-title {{ font-weight: 700; font-size: 15px; margin-bottom: 6px; }}
+  .insight-card:hover {{
+    transform: translateX(3px);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }}
+  .insight-Green {{ border-color: {TEAL};  background: rgba(0,200,150,0.05); }}
+  .insight-Amber {{ border-color: {AMBER}; background: rgba(245,166,35,0.05); }}
+  .insight-Red   {{ border-color: {RED};   background: rgba(232,69,69,0.05); }}
+  .insight-title {{
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }}
   .insight-title-Green {{ color: {TEAL}; }}
   .insight-title-Amber {{ color: {AMBER}; }}
   .insight-title-Red   {{ color: {RED}; }}
-  .insight-body {{ font-size: 14px; color: {TEXT_MUTED}; line-height: 1.6; }}
+  .insight-body {{ font-size: 14px; color: {TEXT_MUTED}; line-height: 1.7; }}
 
-  .styled-divider {{ border: none; border-top: 1px solid {BORDER}; margin: 32px 0; }}
+  .styled-divider {{ border: none; border-top: 1px solid {BORDER}; margin: 36px 0; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -142,7 +145,7 @@ st.markdown(f"""
 CHART_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="Inter, Segoe UI, sans-serif", color=TEXT_WHITE, size=13),
+    font=dict(family="Poppins, Inter, Segoe UI, sans-serif", color=TEXT_WHITE, size=13),
     margin=dict(l=12, r=12, t=40, b=12),
     legend=dict(
         bgcolor="rgba(0,0,0,0)",
@@ -164,14 +167,15 @@ def fmt_currency(v: float) -> str:
     return f"${v:,.0f}"
 
 
-def metric_card(label: str, value: str, sub: str = "", delta: str = "", delta_pos: bool | None = None) -> str:
+def metric_card(label: str, value: str, sub: str = "", delta: str = "", delta_pos: bool | None = None, top_color: str = None) -> str:
     if delta:
         cls = "metric-delta-pos" if delta_pos is True else "metric-delta-neg" if delta_pos is False else "metric-sub"
         extra = f'<div class="metric-sub"><span class="{cls}">{delta}</span></div>'
     else:
         extra = f'<div class="metric-sub">{sub}</div>' if sub else ""
+    border_top = f"border-top: 3px solid {top_color or ACCENT};"
     return f"""
-    <div class="metric-card">
+    <div class="metric-card" style="{border_top}">
       <div class="metric-label">{label}</div>
       <div class="metric-value">{value}</div>
       {extra}
@@ -316,25 +320,35 @@ st.markdown('<div class="section-header">01 · Company Overview</div>', unsafe_a
 prev_revenue = df.iloc[-2]["revenue"] if len(df) >= 2 else kpis["revenue"]
 rev_delta = ((kpis["revenue"] - prev_revenue) / prev_revenue) * 100
 
+gm_color  = TEAL if kpis["gross_margin_pct"] >= 70 else AMBER if kpis["gross_margin_pct"] >= 60 else RED
+burn_color = TEAL if kpis["burn_rate"] >= 0 else AMBER if kpis["burn_rate"] > -30_000 else RED
+rev_color  = TEAL if rev_delta >= 5 else AMBER if rev_delta >= 2 else RED
+rpe_color  = TEAL if kpis["revenue_per_employee"] >= 15_000 else AMBER if kpis["revenue_per_employee"] >= 10_000 else RED
+runway_color = TEAL if kpis["runway_months"] >= 18 or kpis["runway_months"] >= 999 else AMBER if kpis["runway_months"] >= 12 else RED
+
 c1, c2, c3, c4, c5 = st.columns(5)
 with c1:
     st.markdown(metric_card("Monthly Revenue", fmt_currency(kpis["revenue"]),
-                            delta=f"{rev_delta:+.1f}% MoM", delta_pos=rev_delta >= 0), unsafe_allow_html=True)
+                            delta=f"{rev_delta:+.1f}% MoM", delta_pos=rev_delta >= 0,
+                            top_color=rev_color), unsafe_allow_html=True)
 with c2:
     runway_sub = (f"{kpis['runway_months']:.0f} mo runway"
                   if kpis["runway_months"] < 999 else "Cash flow positive")
-    st.markdown(metric_card("Cash Balance", fmt_currency(kpis["cash_balance"]), sub=runway_sub), unsafe_allow_html=True)
+    st.markdown(metric_card("Cash Balance", fmt_currency(kpis["cash_balance"]),
+                            sub=runway_sub, top_color=runway_color), unsafe_allow_html=True)
 with c3:
-    st.markdown(metric_card("Gross Margin", f"{kpis['gross_margin_pct']:.1f}%", sub="Benchmark: 70%"), unsafe_allow_html=True)
+    st.markdown(metric_card("Gross Margin", f"{kpis['gross_margin_pct']:.1f}%",
+                            sub="Benchmark: 70%", top_color=gm_color), unsafe_allow_html=True)
 with c4:
     burn = kpis["burn_rate"]
     burn_str = f"+{fmt_currency(burn)}" if burn >= 0 else f"-{fmt_currency(abs(burn))}"
     st.markdown(metric_card("Net Cash Flow", burn_str,
                             delta="Cash flow positive" if burn >= 0 else "Burning cash",
-                            delta_pos=burn >= 0), unsafe_allow_html=True)
+                            delta_pos=burn >= 0, top_color=burn_color), unsafe_allow_html=True)
 with c5:
     st.markdown(metric_card("Headcount", str(int(kpis["headcount"])),
-                            sub=f"{fmt_currency(kpis['revenue_per_employee'])}/employee/mo"), unsafe_allow_html=True)
+                            sub=f"{fmt_currency(kpis['revenue_per_employee'])}/employee/mo",
+                            top_color=rpe_color), unsafe_allow_html=True)
 
 st.markdown('<div style="margin-top: 12px;"></div>', unsafe_allow_html=True)
 st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
