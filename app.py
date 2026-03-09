@@ -579,6 +579,12 @@ with col_cash:
     fig_cash.update_layout(
         **CHART_LAYOUT, height=320, showlegend=True,
         title=dict(text="Cash Balance & Monthly Net Flow", font=dict(size=13, color=TEXT_MUTED)),
+        margin=dict(l=12, r=80, t=40, b=12),
+        legend=dict(
+            bgcolor="rgba(0,0,0,0)", borderwidth=0,
+            x=0.01, y=0.99, xanchor="left", yanchor="top",
+            font=dict(size=12),
+        ),
     )
     fig_cash.update_layout(
         yaxis=dict(tickprefix="$", tickformat=",.0f", title="Cash Balance", gridcolor="#1a2460"),
