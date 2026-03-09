@@ -267,6 +267,26 @@ with col_status:
 
 st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
 
+with st.expander("How to use this dashboard", expanded=False):
+    st.markdown(f"""
+**What this is:** A simulated financial health review for two fictional SaaS companies.
+Select a company from the sidebar to explore its metrics. Use the month slider to adjust the analysis window.
+
+**The two companies:**
+- **NovaSaaS** — a healthy, profitable B2B SaaS with strong margins and disciplined growth. Use this to see what a well-run company looks like.
+- **CloudForge** — a distressed company burning cash aggressively. Use this to see how the dashboard surfaces financial risk.
+
+**RAG status (Red / Amber / Green):** Each KPI is scored against SaaS SMB industry benchmarks.
+Green = healthy, Amber = watch closely, Red = action required.
+The overall health badge (top right) reflects the combined picture.
+
+**Sections:**
+1. **Company Overview** — snapshot of the 5 most important numbers right now
+2. **Financial Trends** — 24-month charts across revenue, costs, and headcount
+3. **KPI Scorecard** — six benchmarked KPIs with RAG status + a radar chart showing the health profile at a glance
+4. **Consultant Findings** — auto-generated narrative insights, sorted by severity
+5. **Cash Flow & Burn** — P&L waterfall and cash runway chart
+""")
 
 # ── Section 1: Company Overview ───────────────────────────────────────────────
 st.markdown('<div class="section-header">01 · Company Overview</div>', unsafe_allow_html=True)
@@ -463,6 +483,8 @@ with col_radar:
         title=dict(text="Health Score Radar", font=dict(size=13, color=TEXT_MUTED), x=0.5),
     )
     st.plotly_chart(fig_radar, use_container_width=True, config={"displayModeBar": False})
+    st.caption("Each axis = one KPI, normalized 0 (worst) → 1 (best). "
+               "Dashed line = SaaS SMB benchmark. A full outer shape = all KPIs at benchmark or above.")
 
 st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
 

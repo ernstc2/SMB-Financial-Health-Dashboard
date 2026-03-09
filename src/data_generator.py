@@ -12,32 +12,32 @@ from dateutil.relativedelta import relativedelta
 
 COMPANY_PROFILES = {
     "NovaSaaS": {
-        "description": "B2B project management SaaS — healthy growth with rising cost pressure",
+        "description": "B2B project management SaaS — disciplined growth with strong unit economics",
         "industry": "SaaS / Project Management",
         "founded": "2020",
         "seed": 42,
         # Revenue
-        "revenue_start": 180_000,
-        "revenue_growth_base": 0.055,      # ~5.5% MoM early on
-        "revenue_growth_decel": 0.0018,    # growth slows over time (problem signal)
-        "revenue_noise": 0.04,
+        "revenue_start": 120_000,
+        "revenue_growth_base": 0.065,      # ~6.5% MoM — consistently above benchmark
+        "revenue_growth_decel": 0.0003,    # very gradual decel, stays above 5% throughout
+        "revenue_noise": 0.03,
         # COGS
-        "cogs_ratio_start": 0.26,          # starts healthy (~74% gross margin)
-        "cogs_ratio_drift": 0.0025,        # COGS creep (problem signal)
-        "cogs_noise": 0.015,
+        "cogs_ratio_start": 0.22,          # 78% gross margin — premium SaaS
+        "cogs_ratio_drift": 0.001,         # minimal drift, stays ~74-76% GM
+        "cogs_noise": 0.01,
         # Headcount
-        "headcount_start": 18,
-        "headcount_growth_interval": 2,    # new hire roughly every 2 months
-        "headcount_spike_months": [6, 12, 18],
-        "headcount_spike_size": [2, 3, 2],
+        "headcount_start": 12,
+        "headcount_growth_interval": 3,    # disciplined hiring pace
+        "headcount_spike_months": [8, 18],
+        "headcount_spike_size": [2, 1],
         # Operating Expenses (excl. COGS)
-        "opex_per_head": 9_500,
-        "opex_base": 35_000,
-        "opex_noise": 0.06,
-        "opex_surge_month": 14,            # marketing push (problem signal)
-        "opex_surge_amount": 28_000,
+        "opex_per_head": 5_500,
+        "opex_base": 22_000,
+        "opex_noise": 0.04,
+        "opex_surge_month": 99,            # no surge — controlled spend
+        "opex_surge_amount": 0,
         # Cash
-        "cash_start": 2_400_000,
+        "cash_start": 3_000_000,
     },
 
     "CloudForge": {
