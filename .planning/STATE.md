@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Data Upload
 status: executing
-stopped_at: Completed 07-01 — all tasks and human verification done
-last_updated: "2026-03-11T01:57:09.360Z"
+stopped_at: 08-01 Task 1 complete — awaiting human-verify checkpoint (Task 2)
+last_updated: "2026-03-11T02:11:42.753Z"
 last_activity: 2026-03-10 — Completed 06-02 (sidebar upload wiring, template download, data source switching)
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 5
+  completed_plans: 4
   percent: 20
 ---
 
@@ -74,6 +74,8 @@ Recent decisions affecting current work:
 - [Phase 07-01]: NaN check required separately from is_numeric_dtype — pandas converts N/A strings to NaN which passes dtype check
 - [Phase 07-01]: Derived columns guarded by column presence checks in read_uploaded_file() so missing columns don't crash before validator runs
 - [Phase 07-01]: Validation errors render in st.container() placed after upload widget (not st.sidebar.error() at bottom)
+- [Phase 08-01]: Session state dict accumulates multiple uploads; store raw DataFrame pre-KPI in session_state; clearing upload widget does NOT remove from session_state
+- [Phase 08-01]: '.removesuffix() used to resolve display key back to session_state key consistently in both sidebar card and data pipeline
 
 ### Pending Todos
 
@@ -85,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T01:47:45.437Z
-Stopped at: Completed 07-01 — all tasks and human verification done
+Last session: 2026-03-11T02:11:35.231Z
+Stopped at: 08-01 Task 1 complete — awaiting human-verify checkpoint (Task 2)
 Resume file: None
