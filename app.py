@@ -184,6 +184,9 @@ def metric_card(label: str, value: str, sub: str = "", delta: str = "", delta_po
     """
 
 
+# ── Session State ─────────────────────────────────────────────────────────────
+st.session_state.setdefault("uploaded_companies", {})
+
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(f"""
@@ -193,9 +196,17 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    companies = get_all_companies()
+    # Build unified company list: sample companies + any uploaded companies
+    _sample_companies = get_all_companies()
+    _uploaded_keys = list(st.session_state.uploaded_companies.keys())
+    # Disambiguate if an uploaded name collides with a sample name
+    _uploaded_display = [
+        (f"{k} (uploaded)" if k in _sample_companies else k)
+        for k in _uploaded_keys
+    ]
+    companies = _sample_companies + _uploaded_display
     selected_company = st.selectbox("Select Company", companies,
-                                    help="Switch between fictional company profiles")
+                                    help="Switch between fictional company profiles or select an uploaded company")
 
     # Upload section — defined before data pipeline so uploaded_file is available
     st.markdown(f'<div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; margin-top:24px;">Upload Your Data</div>', unsafe_allow_html=True)
@@ -222,10 +233,18 @@ with st.sidebar:
     # not at the bottom of the sidebar
     upload_errors = st.container()
 
-    is_uploaded = uploaded_file is not None
-
     # Company profile card — shows sample profile or uploaded file name
-    if not is_uploaded:
+    # Resolve the internal key: strip " (uploaded)" suffix if present for session_state lookup
+    _selected_key = selected_company.removesuffix(" (uploaded)")
+    if _selected_key in st.session_state.uploaded_companies:
+        st.markdown(f"""
+    <div style="background:{CARD_BG}; border:1px solid {BORDER}; border-radius:10px; padding:14px 16px; margin-top:8px;">
+      <div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px;">Uploaded File</div>
+      <div style="font-size:14px; color:{TEXT_WHITE}; margin-bottom:4px;">{_selected_key}</div>
+      <div style="font-size:13px; color:{TEXT_MUTED}; margin-top:8px;">Source: User upload</div>
+    </div>
+        """, unsafe_allow_html=True)
+    else:
         profile = get_company_profile(selected_company)
         st.markdown(f"""
     <div style="background:{CARD_BG}; border:1px solid {BORDER}; border-radius:10px; padding:14px 16px; margin-top:8px;">
@@ -235,16 +254,6 @@ with st.sidebar:
       <div style="font-size:13px; color:{TEXT_MUTED};">Founded: {profile['founded']}</div>
     </div>
         """, unsafe_allow_html=True)
-    else:
-        display_name = uploaded_file.name.rsplit(".", 1)[0]
-        st.markdown(f"""
-    <div style="background:{CARD_BG}; border:1px solid {BORDER}; border-radius:10px; padding:14px 16px; margin-top:8px;">
-      <div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px;">Uploaded File</div>
-      <div style="font-size:14px; color:{TEXT_WHITE}; margin-bottom:4px;">{display_name}</div>
-      <div style="font-size:13px; color:{TEXT_MUTED}; margin-top:8px;">Source: {uploaded_file.name}</div>
-    </div>
-        """, unsafe_allow_html=True)
-        st.info("Clear the uploaded file to switch back to sample companies.")
 
     st.markdown("<div style='margin-top:24px;'>", unsafe_allow_html=True)
     st.markdown(f'<div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;">Date Range</div>', unsafe_allow_html=True)
@@ -268,6 +277,7 @@ def load_data(company: str, v: str = "v2") -> pd.DataFrame:
     return calculate_kpis(generate_company_data(company))
 
 
+# Process the upload widget: parse, validate, store in session_state
 if uploaded_file is not None:
     try:
         df_uploaded = read_uploaded_file(uploaded_file)
@@ -276,15 +286,19 @@ if uploaded_file is not None:
             with upload_errors:
                 for msg in errors:
                     st.error(msg)
-            df_full = load_data(selected_company, v="v2")
+            # Do NOT store invalid data in session_state
         else:
-            df_full = calculate_kpis(df_uploaded)
-            selected_company = uploaded_file.name.rsplit(".", 1)[0]
+            display_name = uploaded_file.name.rsplit(".", 1)[0]
+            st.session_state.uploaded_companies[display_name] = df_uploaded
     except Exception as e:
         with upload_errors:
             st.error(f"Could not read file: {e}")
-        # Fall back to sample data
-        df_full = load_data(selected_company, v="v2")
+
+# Unified data pipeline: load from session_state or sample based on selected_company
+# Resolve internal key (strip " (uploaded)" suffix used for disambiguation)
+_pipeline_key = selected_company.removesuffix(" (uploaded)")
+if _pipeline_key in st.session_state.uploaded_companies:
+    df_full = calculate_kpis(st.session_state.uploaded_companies[_pipeline_key])
 else:
     df_full = load_data(selected_company, v="v2")
 
