@@ -36,7 +36,7 @@ Phases 1-5 were built before GSD was adopted. What shipped:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Template file infrastructure and CSV/Excel reading utilities
+- [x] 06-01-PLAN.md — Template file infrastructure and CSV/Excel reading utilities
 - [ ] 06-02-PLAN.md — Sidebar upload widget, download button, and data source switching
 
 #### Phase 7: Validation
@@ -77,6 +77,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-5. Foundation | v1.0 | — | Complete | pre-GSD |
-| 6. File Input | v1.1 | 0/2 | Not started | - |
+| 6. File Input | v1.1 | 1/2 | In progress | - |
 | 7. Validation | v1.1 | 0/1 | Not started | - |
 | 8. Analysis Integration | v1.1 | 0/3 | Not started | - |
