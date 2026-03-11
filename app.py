@@ -50,6 +50,23 @@ st.markdown(f"""
   }}
   [data-testid="stSidebar"] * {{ color: {TEXT_WHITE} !important; }}
   #MainMenu, footer, header {{ visibility: hidden; }}
+  /* Force sidebar always open and remove collapse control */
+  [data-testid="stSidebar"] {{
+    transform: none !important;
+    width: 21rem !important;
+    min-width: 21rem !important;
+  }}
+  [data-testid="stSidebar"] > div:first-child {{
+    width: 21rem !important;
+  }}
+  /* Hide ALL sidebar collapse/expand controls */
+  [data-testid="collapsedControl"],
+  [data-testid="stSidebarCollapse"],
+  [data-testid="stSidebarCollapseButton"],
+  section[data-testid="stSidebar"] button:has(svg) {{
+    display: none !important;
+    visibility: hidden !important;
+  }}
 
   /* ── Metric Cards ── */
   .metric-card {{
