@@ -218,6 +218,10 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
+    # Error container placed right after upload widget so errors appear here,
+    # not at the bottom of the sidebar
+    upload_errors = st.container()
+
     is_uploaded = uploaded_file is not None
 
     # Company profile card — shows sample profile or uploaded file name
@@ -269,14 +273,16 @@ if uploaded_file is not None:
         df_uploaded = read_uploaded_file(uploaded_file)
         errors = validate_uploaded_df(df_uploaded)
         if errors:
-            for msg in errors:
-                st.sidebar.error(msg)
+            with upload_errors:
+                for msg in errors:
+                    st.error(msg)
             df_full = load_data(selected_company, v="v2")
         else:
             df_full = calculate_kpis(df_uploaded)
             selected_company = uploaded_file.name.rsplit(".", 1)[0]
     except Exception as e:
-        st.sidebar.error(f"Could not read file: {e}")
+        with upload_errors:
+            st.error(f"Could not read file: {e}")
         # Fall back to sample data
         df_full = load_data(selected_company, v="v2")
 else:

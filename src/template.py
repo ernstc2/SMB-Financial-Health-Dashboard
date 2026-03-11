@@ -119,6 +119,13 @@ def validate_uploaded_df(df: pd.DataFrame) -> list[str]:
                 f"Column '{col}' must contain numbers only. "
                 "Check for text, currency symbols (e.g. $), or blank cells."
             )
+        elif df[col].isna().any():
+            bad_rows = df.index[df[col].isna()].tolist()
+            rows = ", ".join(str(r + 2) for r in bad_rows)
+            errors.append(
+                f"Column '{col}' has blank or unreadable values in rows: {rows}. "
+                "Fill in all cells with numbers."
+            )
 
     # --- VALID-02b: business rules (only if types are clean) ---
     if not errors:
@@ -210,22 +217,30 @@ def read_uploaded_file(uploaded_file) -> pd.DataFrame:
     # Normalise column names (strip whitespace, lowercase)
     df.columns = [c.strip().lower() for c in df.columns]
 
-    # Parse and sort by date
-    try:
-        df["date"] = pd.to_datetime(df["date"])
-    except Exception as exc:
-        raise ValueError(
-            f"Could not parse 'date' column: {exc}. "
-            "Use ISO format YYYY-MM-DD (e.g. 2024-01-01)."
-        ) from exc
+    # Parse and sort by date (skip if date column is missing —
+    # validate_uploaded_df() will report the missing column)
+    if "date" in df.columns:
+        try:
+            df["date"] = pd.to_datetime(df["date"])
+        except Exception as exc:
+            raise ValueError(
+                f"Could not parse 'date' column: {exc}. "
+                "Use ISO format YYYY-MM-DD (e.g. 2024-01-01)."
+            ) from exc
 
-    df = df.sort_values("date").reset_index(drop=True)
+        df = df.sort_values("date").reset_index(drop=True)
 
-    # Compute derived columns to match generate_company_data() output
-    df["gross_profit"] = df["revenue"] - df["cogs"]
-    df["net_income"] = df["revenue"] - df["cogs"] - df["opex"]
-    df["month_label"] = df["date"].dt.strftime("%b %Y")
-    df["month_index"] = range(1, len(df) + 1)
+    # Compute derived columns only if source columns are present.
+    # Missing columns are caught by validate_uploaded_df() with actionable messages
+    # rather than crashing here with an unhelpful KeyError.
+    has_financials = all(c in df.columns for c in ["revenue", "cogs", "opex"])
+    if has_financials:
+        df["gross_profit"] = df["revenue"] - df["cogs"]
+        df["net_income"] = df["revenue"] - df["cogs"] - df["opex"]
+
+    if "date" in df.columns:
+        df["month_label"] = df["date"].dt.strftime("%b %Y")
+        df["month_index"] = range(1, len(df) + 1)
 
     # Return with column order matching generate_company_data()
     ordered_cols = [
@@ -240,6 +255,7 @@ def read_uploaded_file(uploaded_file) -> pd.DataFrame:
         "headcount",
         "cash_balance",
     ]
-    # Keep any extra columns the user included, appended after the standard set
+    # Only include columns that actually exist
+    present_cols = [c for c in ordered_cols if c in df.columns]
     extra_cols = [c for c in df.columns if c not in ordered_cols]
-    return df[ordered_cols + extra_cols]
+    return df[present_cols + extra_cols]
