@@ -52,7 +52,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 07-01-PLAN.md — TDD validation: column presence, data types, business rules, and app.py wiring
+- [x] 07-01-PLAN.md — TDD validation: column presence, data types, business rules, and app.py wiring
 
 #### Phase 8: Analysis Integration
 
@@ -63,12 +63,11 @@ Plans:
   1. Uploaded companies appear by name in the sidebar company dropdown alongside sample companies
   2. Selecting an uploaded company shows a fully populated dashboard — all five sections render correctly with that company's data
   3. User can select any two companies and view their KPIs, charts, and scorecard side-by-side in a comparison view
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 08-01: Data pipeline refactor — all analysis accepts dynamic DataFrame input
-- [ ] 08-02: Company dropdown and session state for uploaded data
-- [ ] 08-03: Side-by-side comparison view
+- [ ] 08-01-PLAN.md — Session state for uploaded companies, unified dropdown, full dashboard rendering
+- [ ] 08-02-PLAN.md — Side-by-side comparison view with dual-company selection
 
 ## Progress
 
@@ -78,5 +77,5 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1-5. Foundation | v1.0 | — | Complete | pre-GSD |
 | 6. File Input | v1.1 | 2/2 | Complete | 2026-03-11 |
-| 7. Validation | 1/1 | Complete   | 2026-03-11 | - |
-| 8. Analysis Integration | v1.1 | 0/3 | Not started | - |
+| 7. Validation | v1.1 | 1/1 | Complete | 2026-03-11 |
+| 8. Analysis Integration | v1.1 | 0/2 | Not started | - |
