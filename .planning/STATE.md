@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Data Upload
 status: executing
-stopped_at: "Completed 07-01 tasks 1-2 — checkpoint:human-verify pending for task 3"
-last_updated: "2026-03-11T01:28:52.698Z"
+stopped_at: Completed 07-01 — all tasks and human verification done
+last_updated: "2026-03-11T01:47:45.440Z"
 last_activity: 2026-03-10 — Completed 06-02 (sidebar upload wiring, template download, data source switching)
 progress:
   total_phases: 3
@@ -51,6 +51,7 @@ Progress: [██░░░░░░░░] 20% (v1.1)
 
 *Updated after each plan completion*
 | Phase 07-validation P01 | 10 | 2 tasks | 4 files |
+| Phase 07-validation P01 | 20 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,9 @@ Recent decisions affecting current work:
 - [06-02] Uploaded file stem used as company display name (no extra UI input required)
 - [Phase 07-01]: validate_uploaded_df returns list[str] (empty=valid) so app controls display logic; column presence check returns early; business rules only run when types clean
 - [Phase 07-01]: Row numbers reported as index+2 for spreadsheet display; validation errors in st.sidebar.error() consistent with Phase 6; invalid files fall back to sample data
+- [Phase 07-01]: NaN check required separately from is_numeric_dtype — pandas converts N/A strings to NaN which passes dtype check
+- [Phase 07-01]: Derived columns guarded by column presence checks in read_uploaded_file() so missing columns don't crash before validator runs
+- [Phase 07-01]: Validation errors render in st.container() placed after upload widget (not st.sidebar.error() at bottom)
 
 ### Pending Todos
 
@@ -81,6 +85,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T01:28:52.696Z
-Stopped at: Completed 07-01 tasks 1-2 — checkpoint:human-verify pending for task 3
+Last session: 2026-03-11T01:47:45.437Z
+Stopped at: Completed 07-01 — all tasks and human verification done
 Resume file: None
