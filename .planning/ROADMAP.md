@@ -37,7 +37,7 @@ Phases 1-5 were built before GSD was adopted. What shipped:
 
 Plans:
 - [x] 06-01-PLAN.md — Template file infrastructure and CSV/Excel reading utilities
-- [ ] 06-02-PLAN.md — Sidebar upload widget, download button, and data source switching
+- [x] 06-02-PLAN.md — Sidebar upload widget, download button, and data source switching
 
 #### Phase 7: Validation
 
@@ -49,10 +49,10 @@ Plans:
   2. User sees a specific error identifying which cells contain invalid data types or impossible values (e.g. negative headcount)
   3. Valid files pass through silently with no error shown
   4. Error messages tell the user exactly what to fix, not just that something is wrong
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 07-01: Column presence and data type validation with error display
+- [ ] 07-01-PLAN.md — TDD validation: column presence, data types, business rules, and app.py wiring
 
 #### Phase 8: Analysis Integration
 
@@ -77,6 +77,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-5. Foundation | v1.0 | — | Complete | pre-GSD |
-| 6. File Input | 2/2 | Complete   | 2026-03-11 | - |
+| 6. File Input | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 7. Validation | v1.1 | 0/1 | Not started | - |
 | 8. Analysis Integration | v1.1 | 0/3 | Not started | - |
