@@ -15,9 +15,9 @@ Requirements for milestone v1.1 — Dynamic Data Upload. Each maps to roadmap ph
 
 ### Validation
 
-- [ ] **VALID-01**: System validates that required columns are present (date, revenue, COGS, opex, headcount, cash)
-- [ ] **VALID-02**: System validates data types (numeric values, valid dates, no impossible values)
-- [ ] **VALID-03**: System displays specific, actionable error messages telling users exactly what to fix
+- [x] **VALID-01**: System validates that required columns are present (date, revenue, COGS, opex, headcount, cash)
+- [x] **VALID-02**: System validates data types (numeric values, valid dates, no impossible values)
+- [x] **VALID-03**: System displays specific, actionable error messages telling users exactly what to fix
 
 ### Analysis
 
@@ -52,9 +52,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INPUT-01 | Phase 6 | Complete |
 | INPUT-02 | Phase 6 | Complete (06-01) |
 | INPUT-03 | Phase 6 | Complete |
-| VALID-01 | Phase 7 | Pending |
-| VALID-02 | Phase 7 | Pending |
-| VALID-03 | Phase 7 | Pending |
+| VALID-01 | Phase 7 | Complete |
+| VALID-02 | Phase 7 | Complete |
+| VALID-03 | Phase 7 | Complete |
 | ANLYS-01 | Phase 8 | Pending |
 | ANLYS-02 | Phase 8 | Pending |
 | ANLYS-03 | Phase 8 | Pending |

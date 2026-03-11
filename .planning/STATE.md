@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Data Upload
 status: executing
-stopped_at: Completed 06-02-PLAN.md — ready for 06-03 (column validator)
-last_updated: "2026-03-11T01:11:00.877Z"
+stopped_at: "Completed 07-01 tasks 1-2 — checkpoint:human-verify pending for task 3"
+last_updated: "2026-03-11T01:28:52.698Z"
 last_activity: 2026-03-10 — Completed 06-02 (sidebar upload wiring, template download, data source switching)
 progress:
   total_phases: 3
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 3
   percent: 20
 ---
 
@@ -50,6 +50,7 @@ Progress: [██░░░░░░░░] 20% (v1.1)
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 07-validation P01 | 10 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ Recent decisions affecting current work:
 - [06-02] Sidebar widgets declared before data pipeline block (Streamlit top-to-bottom execution requirement)
 - [06-02] Parse errors fall back to sample data with sidebar error — preserves usability with malformed files
 - [06-02] Uploaded file stem used as company display name (no extra UI input required)
+- [Phase 07-01]: validate_uploaded_df returns list[str] (empty=valid) so app controls display logic; column presence check returns early; business rules only run when types clean
+- [Phase 07-01]: Row numbers reported as index+2 for spreadsheet display; validation errors in st.sidebar.error() consistent with Phase 6; invalid files fall back to sample data
 
 ### Pending Todos
 
@@ -78,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10
-Stopped at: Completed 06-02-PLAN.md — ready for 06-03 (column validator)
+Last session: 2026-03-11T01:28:52.696Z
+Stopped at: Completed 07-01 tasks 1-2 — checkpoint:human-verify pending for task 3
 Resume file: None
