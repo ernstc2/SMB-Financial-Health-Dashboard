@@ -187,6 +187,12 @@ def metric_card(label: str, value: str, sub: str = "", delta: str = "", delta_po
 # ── Session State ─────────────────────────────────────────────────────────────
 st.session_state.setdefault("uploaded_companies", {})
 st.session_state.setdefault("_upload_success", None)
+st.session_state.setdefault("_pending_select", None)
+
+# Apply pending company selection BEFORE the selectbox widget is instantiated
+if st.session_state._pending_select:
+    st.session_state.company_select = st.session_state._pending_select
+    st.session_state._pending_select = None
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
@@ -311,7 +317,7 @@ if uploaded_file is not None:
             if is_new:
                 # Auto-select the newly uploaded company in the dropdown
                 _select_name = f"{display_name} (uploaded)" if display_name in _sample_companies else display_name
-                st.session_state.company_select = _select_name
+                st.session_state._pending_select = _select_name
                 st.session_state._upload_success = display_name
                 st.rerun()
     except Exception as e:
@@ -524,27 +530,46 @@ if compare_mode and compare_company:
     # ── Section 3: Revenue Trend Comparison ───────────────────────────────────
     st.markdown('<div class="section-header">03 · Revenue Trend Comparison</div>', unsafe_allow_html=True)
 
+    # Use month index (Month 1, 2, ...) so companies with different date ranges align
+    _months_a = [f"Month {i+1}" for i in range(len(df_a))]
+    _months_b = [f"Month {i+1}" for i in range(len(df_b))]
+
     fig_rev_cmp = go.Figure()
     fig_rev_cmp.add_trace(go.Scatter(
-        x=df_a["month_label"], y=df_a["revenue"],
+        x=_months_a, y=df_a["revenue"],
         name=selected_company, mode="lines",
         line=dict(color=ACCENT, width=2.5),
         fill="tozeroy", fillcolor="rgba(59,130,246,0.07)",
-        hovertemplate="$%{y:,.0f}",
+        customdata=df_a["month_label"],
+        hovertemplate="%{customdata}: $%{y:,.0f}<extra></extra>",
     ))
     fig_rev_cmp.add_trace(go.Scatter(
-        x=df_b["month_label"], y=df_b["revenue"],
+        x=_months_b, y=df_b["revenue"],
         name=compare_company, mode="lines",
         line=dict(color=TEAL, width=2.5, dash="dash"),
         fill="tozeroy", fillcolor="rgba(0,200,150,0.05)",
-        hovertemplate="$%{y:,.0f}",
+        customdata=df_b["month_label"],
+        hovertemplate="%{customdata}: $%{y:,.0f}<extra></extra>",
     ))
-    fig_rev_cmp.update_layout(
-        **CHART_LAYOUT, height=300, showlegend=True,
-        title=dict(text="Monthly Revenue", font=dict(size=13, color=TEXT_MUTED)),
-        yaxis=dict(tickprefix="$", tickformat=",.0f", gridcolor="#21262d"),
-    )
+    fig_rev_cmp.update_layout(**CHART_LAYOUT, height=300, showlegend=True,
+        title=dict(text="Monthly Revenue (aligned from start)", font=dict(size=13, color=TEXT_MUTED)))
+    fig_rev_cmp.update_yaxes(tickprefix="$", tickformat=",.0f", gridcolor="#21262d")
     st.plotly_chart(fig_rev_cmp, use_container_width=True, config={"displayModeBar": False})
+
+    # Show alignment explanation when date ranges differ
+    _dates_match = (len(df_a) == len(df_b) and
+                    df_a["month_label"].iloc[0] == df_b["month_label"].iloc[0] and
+                    df_a["month_label"].iloc[-1] == df_b["month_label"].iloc[-1])
+    if not _dates_match:
+        st.info(
+            f"**Different date ranges detected.** "
+            f"{selected_company} spans {df_a['month_label'].iloc[0]}–{df_a['month_label'].iloc[-1]} "
+            f"({len(df_a)} months), while {compare_company} spans "
+            f"{df_b['month_label'].iloc[0]}–{df_b['month_label'].iloc[-1]} ({len(df_b)} months). "
+            f"The chart aligns both from Month 1 so you can compare performance at the same stage "
+            f"of growth. Hover over any point to see the actual date.",
+            icon="ℹ️"
+        )
 
     st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
 
