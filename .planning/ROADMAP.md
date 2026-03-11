@@ -33,11 +33,11 @@ Phases 1-5 were built before GSD was adopted. What shipped:
   1. User can upload a CSV or Excel file via the sidebar without leaving the dashboard
   2. User can download a pre-formatted template file that shows exactly what columns and format are required
   3. Dashboard loads NovaSaaS and CloudForge sample data by default when no file is uploaded
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: Sidebar upload widget + template download button
-- [ ] 06-02: Sample data default mode and data source switching
+- [ ] 06-01-PLAN.md — Template file infrastructure and CSV/Excel reading utilities
+- [ ] 06-02-PLAN.md — Sidebar upload widget, download button, and data source switching
 
 #### Phase 7: Validation
 
