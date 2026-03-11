@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A portfolio-grade consulting analytics tool that lets users upload SMB financial data (CSV/Excel) and instantly receive KPI scoring, RAG-rated benchmarks, automated insights, and interactive visualizations. Built with Python, Pandas, Streamlit, and Plotly. Designed to demonstrate the kind of data-driven deliverable a tech consultant would hand to a client.
+A portfolio-grade consulting analytics tool that lets users upload SMB financial data (CSV/Excel) and instantly receive KPI scoring, RAG-rated benchmarks, automated insights, and interactive visualizations — with side-by-side company comparison. Built with Python, Pandas, Streamlit, and Plotly. Designed to demonstrate the kind of data-driven deliverable a tech consultant would hand to a client.
 
 ## Core Value
 
@@ -20,17 +20,18 @@ A hiring manager can open this tool, upload (or explore sample) financial data, 
 - ✓ 2 synthetic company profiles (NovaSaaS, CloudForge) with 24-month data — v1.0
 - ✓ Polished dark charcoal theme with custom typography — v1.0
 - ✓ Interactive Plotly charts (waterfall, dual-axis, radar) — v1.0
+- ✓ CSV/Excel file upload for user-supplied company data — v1.1
+- ✓ Downloadable data template matching required schema — v1.1
+- ✓ Strict upload validation with clear, actionable error messages — v1.1
+- ✓ Multi-company upload with session persistence and unified dropdown — v1.1
+- ✓ Sample data mode (NovaSaaS, CloudForge) as default demo — v1.1
+- ✓ Side-by-side company comparison view (KPI table, radar, revenue overlay) — v1.1
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-- [ ] CSV/Excel file upload for user-supplied company data
-- [ ] Downloadable data template matching required schema
-- [ ] Strict upload validation with clear error messages
-- [ ] Multi-company upload and side-by-side comparison
-- [ ] Sample data mode (existing companies) as default demo
-- [ ] All existing analysis works on uploaded data
+(None — next milestone not yet planned)
 
 ### Out of Scope
 
@@ -42,9 +43,11 @@ A hiring manager can open this tool, upload (or explore sample) financial data, 
 ## Context
 
 - **Portfolio project** targeting entry-level tech consulting roles. Hiring managers are the primary audience.
-- Everything should be demo-able with zero setup — sample data loads by default, upload is optional.
+- Everything is demo-able with zero setup — sample data loads by default, upload is optional.
 - Current data shape: monthly rows with columns for revenue, COGS, operating expenses, headcount, cash balance.
-- All KPI calculations and chart logic already work — they just need to accept dynamic data instead of hardcoded profiles.
+- **v1.0** shipped 5-section dashboard with hardcoded sample companies.
+- **v1.1** added CSV/Excel upload, validation, multi-company session state, and side-by-side comparison.
+- Codebase: ~2,025 LOC Python (app.py 1,007 + src/ 864 + tests/ 154). Single `streamlit run app.py` deployment.
 
 ## Constraints
 
@@ -53,24 +56,20 @@ A hiring manager can open this tool, upload (or explore sample) financial data, 
 - **Audience**: Non-technical hiring managers — must be intuitive, polished, zero-friction
 - **Deployment**: Must work as a single `streamlit run app.py` command
 
-## Current Milestone: v1.1 Dynamic Data Upload
-
-**Goal:** Transform the dashboard from hardcoded demo data to a tool that analyzes any SMB's financials via CSV/Excel upload, while keeping sample companies for demo mode.
-
-**Target features:**
-- CSV/Excel upload with multi-company support
-- Downloadable template + strict validation with clear errors
-- Sample data preserved as default demo mode
-- Side-by-side comparison of uploaded companies
-
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| CSV/Excel upload over API lookup | Fits SMB consulting narrative; no API dependencies | — Pending |
-| Strict template over flexible parsing | More reliable, professional UX, simpler to build | — Pending |
-| Keep sample companies as demo mode | Hiring managers can explore without needing a file | — Pending |
-| Multi-company comparison | Preserves comparative analysis angle from v1.0 | — Pending |
+| CSV/Excel upload over API lookup | Fits SMB consulting narrative; no API dependencies | ✓ Good — clean UX, no external deps |
+| Strict template over flexible parsing | More reliable, professional UX, simpler to build | ✓ Good — validation catches all format issues |
+| Keep sample companies as demo mode | Hiring managers can explore without needing a file | ✓ Good — zero-friction default |
+| Multi-company comparison | Preserves comparative analysis angle from v1.0 | ✓ Good — natural extension of the tool |
+| Session state dict for uploads | Multiple uploads accumulate; raw DataFrame stored pre-KPI | ✓ Good — handles re-uploads cleanly |
+| Validate-before-calculate gate | Blocks invalid data from reaching KPI engine | ✓ Good — 10 tests verify all edge cases |
+| Derived columns in read_uploaded_file | Existing pipeline stays unchanged; zero modifications to kpi_engine/charts | ✓ Good — minimal blast radius |
+| Error display in st.container after upload widget | Errors visible near the upload, not buried at sidebar bottom | ✓ Good — bug fix during human-verify |
+| Clean if/else for comparison vs single-company | Complete separation avoids fragile merged layout code | ✓ Good — maintainable |
+| Month-index x-axis alignment | Companies with different date ranges render correctly on shared axis | ✓ Good — actual dates in hover customdata |
 
 ---
-*Last updated: 2026-03-10 after milestone v1.1 kickoff*
+*Last updated: 2026-03-11 after v1.1 milestone*
