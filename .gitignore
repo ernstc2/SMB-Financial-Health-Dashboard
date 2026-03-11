@@ -4,3 +4,8 @@ __pycache__/
 venv/
 *.egg-info/
 .streamlit/secrets.toml
+.claude/launch.json
+.claude/worktrees/agitated-greider/
+.claude/worktrees/wonderful-clarke/
+.claude/settings.local.json
+.vscode/
