@@ -12,6 +12,7 @@ from src.data_generator import generate_company_data, get_all_companies, get_com
 from src.kpi_engine import calculate_kpis, get_latest_kpis
 from src.benchmarks import build_scorecard, BENCHMARKS, RAG_COLORS
 from src.insights import generate_insights
+from src.template import read_uploaded_file, get_template_csv_bytes
 
 # ── Page Configuration ────────────────────────────────────────────────────────
 st.set_page_config(
@@ -196,15 +197,50 @@ with st.sidebar:
     selected_company = st.selectbox("Select Company", companies,
                                     help="Switch between fictional company profiles")
 
-    profile = get_company_profile(selected_company)
-    st.markdown(f"""
+    # Upload section — defined before data pipeline so uploaded_file is available
+    st.markdown(f'<div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; margin-top:24px;">Upload Your Data</div>', unsafe_allow_html=True)
+    uploaded_file = st.file_uploader(
+        "Upload CSV or Excel",
+        type=["csv", "xlsx", "xls"],
+        key="file_upload",
+        help="Upload a file matching the template format",
+    )
+    st.download_button(
+        label="Download Template CSV",
+        data=get_template_csv_bytes(),
+        file_name="smb_financial_template.csv",
+        mime="text/csv",
+    )
+    st.markdown(
+        f'<div style="font-size:12px; color:{TEXT_MUTED}; margin-top:6px; line-height:1.5;">'
+        "Upload your company's monthly financials. Download the template to see the required format."
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    is_uploaded = uploaded_file is not None
+
+    # Company profile card — shows sample profile or uploaded file name
+    if not is_uploaded:
+        profile = get_company_profile(selected_company)
+        st.markdown(f"""
     <div style="background:{CARD_BG}; border:1px solid {BORDER}; border-radius:10px; padding:14px 16px; margin-top:8px;">
       <div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px;">Company Profile</div>
       <div style="font-size:14px; color:{TEXT_WHITE}; margin-bottom:4px;">{profile['description']}</div>
       <div style="font-size:13px; color:{TEXT_MUTED}; margin-top:8px;">Industry: {profile['industry']}</div>
       <div style="font-size:13px; color:{TEXT_MUTED};">Founded: {profile['founded']}</div>
     </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    else:
+        display_name = uploaded_file.name.rsplit(".", 1)[0]
+        st.markdown(f"""
+    <div style="background:{CARD_BG}; border:1px solid {BORDER}; border-radius:10px; padding:14px 16px; margin-top:8px;">
+      <div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px;">Uploaded File</div>
+      <div style="font-size:14px; color:{TEXT_WHITE}; margin-bottom:4px;">{display_name}</div>
+      <div style="font-size:13px; color:{TEXT_MUTED}; margin-top:8px;">Source: {uploaded_file.name}</div>
+    </div>
+        """, unsafe_allow_html=True)
+        st.info("Clear the uploaded file to switch back to sample companies.")
 
     st.markdown("<div style='margin-top:24px;'>", unsafe_allow_html=True)
     st.markdown(f'<div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;">Date Range</div>', unsafe_allow_html=True)
@@ -228,7 +264,19 @@ def load_data(company: str, v: str = "v2") -> pd.DataFrame:
     return calculate_kpis(generate_company_data(company))
 
 
-df_full = load_data(selected_company, v="v2")
+if uploaded_file is not None:
+    try:
+        df_uploaded = read_uploaded_file(uploaded_file)
+        df_full = calculate_kpis(df_uploaded)
+        # Override company display info with filename (without extension)
+        selected_company = uploaded_file.name.rsplit(".", 1)[0]
+    except Exception as e:
+        st.sidebar.error(f"Could not read file: {e}")
+        # Fall back to sample data
+        df_full = load_data(selected_company, v="v2")
+else:
+    df_full = load_data(selected_company, v="v2")
+
 df = df_full.tail(month_range).copy().reset_index(drop=True)
 kpis = get_latest_kpis(df)
 scorecard = build_scorecard(kpis)
@@ -280,8 +328,9 @@ st.markdown(f"""
     <div style="flex:2; min-width:220px;">
       <div style="font-size:13px; color:{TEXT_WHITE}; font-weight:600; margin-bottom:4px;">What this is</div>
       <div style="font-size:13px; color:{TEXT_MUTED}; line-height:1.7; margin-bottom:12px;">
-        A simulated financial health review for two fictional SaaS companies. Select a company
-        in the sidebar and use the month slider to adjust the analysis window.
+        A simulated financial health review for two fictional SaaS companies. Upload your own
+        CSV/Excel data via the sidebar, or explore two fictional SaaS companies. Use the month
+        slider to adjust the analysis window.
       </div>
       <div style="font-size:13px; color:{TEXT_WHITE}; font-weight:600; margin-bottom:4px;">RAG Status</div>
       <div style="font-size:13px; color:{TEXT_MUTED}; line-height:1.7;">
