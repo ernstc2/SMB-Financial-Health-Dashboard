@@ -186,6 +186,7 @@ def metric_card(label: str, value: str, sub: str = "", delta: str = "", delta_po
 
 # ── Session State ─────────────────────────────────────────────────────────────
 st.session_state.setdefault("uploaded_companies", {})
+st.session_state.setdefault("_upload_success", None)
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
@@ -206,7 +207,14 @@ with st.sidebar:
     ]
     companies = _sample_companies + _uploaded_display
     selected_company = st.selectbox("Select Company", companies,
+                                    key="company_select",
                                     help="Switch between fictional company profiles or select an uploaded company")
+
+    # Show success message when a company was just uploaded
+    if st.session_state._upload_success:
+        _success_name = st.session_state._upload_success
+        st.success(f"✓ \"{_success_name}\" added! Available in the dropdown above and persists if you upload more companies.")
+        st.session_state._upload_success = None
 
     # Upload section — defined before data pipeline so uploaded_file is available
     st.markdown(f'<div style="font-size:11px; font-weight:700; color:{TEXT_MUTED}; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; margin-top:24px;">Upload Your Data</div>', unsafe_allow_html=True)
@@ -289,7 +297,14 @@ if uploaded_file is not None:
             # Do NOT store invalid data in session_state
         else:
             display_name = uploaded_file.name.rsplit(".", 1)[0]
+            is_new = display_name not in st.session_state.uploaded_companies
             st.session_state.uploaded_companies[display_name] = df_uploaded
+            if is_new:
+                # Auto-select the newly uploaded company in the dropdown
+                _select_name = f"{display_name} (uploaded)" if display_name in _sample_companies else display_name
+                st.session_state.company_select = _select_name
+                st.session_state._upload_success = display_name
+                st.rerun()
     except Exception as e:
         with upload_errors:
             st.error(f"Could not read file: {e}")
