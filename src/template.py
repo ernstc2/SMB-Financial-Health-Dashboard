@@ -83,6 +83,86 @@ def get_template_csv_bytes() -> bytes:
     return df.to_csv(index=False).encode("utf-8")
 
 
+def validate_uploaded_df(df: pd.DataFrame) -> list[str]:
+    """Validate a parsed upload DataFrame against the required schema.
+
+    Checks are ordered so that cheaper, blocking errors (missing columns) are
+    reported first and later checks are only run when they are meaningful.
+
+    Parameters
+    ----------
+    df:
+        A DataFrame returned by ``read_uploaded_file()``.
+
+    Returns
+    -------
+    list[str]
+        Human-readable error strings, one per violation.  An empty list means
+        the DataFrame is valid and may proceed to ``calculate_kpis()``.
+    """
+    errors: list[str] = []
+
+    # --- VALID-01: column presence ---
+    missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
+    if missing:
+        errors.append(
+            f"Missing required columns: {', '.join(missing)}. "
+            "Download the template to see the required format."
+        )
+        return errors  # pointless to check types if columns are absent
+
+    # --- VALID-02a: numeric columns ---
+    numeric_cols = ["revenue", "cogs", "opex", "headcount", "cash_balance"]
+    for col in numeric_cols:
+        if not pd.api.types.is_numeric_dtype(df[col]):
+            errors.append(
+                f"Column '{col}' must contain numbers only. "
+                "Check for text, currency symbols (e.g. $), or blank cells."
+            )
+
+    # --- VALID-02b: business rules (only if types are clean) ---
+    if not errors:
+        # Headcount must be > 0
+        bad_hc = df.index[df["headcount"] <= 0].tolist()
+        if bad_hc:
+            rows = ", ".join(str(r + 2) for r in bad_hc)
+            errors.append(
+                f"'headcount' must be greater than 0. "
+                f"Fix rows: {rows}."
+            )
+        # Revenue must be > 0
+        bad_rev = df.index[df["revenue"] <= 0].tolist()
+        if bad_rev:
+            rows = ", ".join(str(r + 2) for r in bad_rev)
+            errors.append(
+                f"'revenue' must be greater than 0. "
+                f"Fix rows: {rows}."
+            )
+        # COGS and opex must be non-negative
+        for col in ["cogs", "opex"]:
+            bad = df.index[df[col] < 0].tolist()
+            if bad:
+                rows = ", ".join(str(r + 2) for r in bad)
+                errors.append(
+                    f"'{col}' cannot be negative. Fix rows: {rows}."
+                )
+        # Cash balance must be non-negative
+        bad_cash = df.index[df["cash_balance"] < 0].tolist()
+        if bad_cash:
+            rows = ", ".join(str(r + 2) for r in bad_cash)
+            errors.append(
+                f"'cash_balance' cannot be negative. Fix rows: {rows}."
+            )
+        # Minimum row count (KPI engine needs at least 2 rows for MoM growth)
+        if len(df) < 2:
+            errors.append(
+                "File must contain at least 2 months of data "
+                f"(found {len(df)} row)."
+            )
+
+    return errors
+
+
 def read_uploaded_file(uploaded_file) -> pd.DataFrame:
     """Parse a Streamlit UploadedFile (CSV or Excel) into a pipeline-compatible DataFrame.
 
