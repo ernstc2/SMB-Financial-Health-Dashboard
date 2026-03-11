@@ -12,7 +12,7 @@ from src.data_generator import generate_company_data, get_all_companies, get_com
 from src.kpi_engine import calculate_kpis, get_latest_kpis
 from src.benchmarks import build_scorecard, BENCHMARKS, RAG_COLORS
 from src.insights import generate_insights
-from src.template import read_uploaded_file, get_template_csv_bytes
+from src.template import read_uploaded_file, get_template_csv_bytes, validate_uploaded_df
 
 # ── Page Configuration ────────────────────────────────────────────────────────
 st.set_page_config(
@@ -267,9 +267,14 @@ def load_data(company: str, v: str = "v2") -> pd.DataFrame:
 if uploaded_file is not None:
     try:
         df_uploaded = read_uploaded_file(uploaded_file)
-        df_full = calculate_kpis(df_uploaded)
-        # Override company display info with filename (without extension)
-        selected_company = uploaded_file.name.rsplit(".", 1)[0]
+        errors = validate_uploaded_df(df_uploaded)
+        if errors:
+            for msg in errors:
+                st.sidebar.error(msg)
+            df_full = load_data(selected_company, v="v2")
+        else:
+            df_full = calculate_kpis(df_uploaded)
+            selected_company = uploaded_file.name.rsplit(".", 1)[0]
     except Exception as e:
         st.sidebar.error(f"Could not read file: {e}")
         # Fall back to sample data
