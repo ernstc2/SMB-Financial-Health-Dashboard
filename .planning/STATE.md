@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Data Upload
 status: executing
-stopped_at: Completed 08-01 — upload-to-dropdown integration verified by human checkpoint
-last_updated: "2026-03-11T02:19:27.146Z"
+stopped_at: Completed 08-02 — comparison view verified by human checkpoint
+last_updated: "2026-03-11T02:40:49.688Z"
 last_activity: 2026-03-10 — Completed 06-02 (sidebar upload wiring, template download, data source switching)
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 20
 ---
 
@@ -53,6 +53,7 @@ Progress: [██░░░░░░░░] 20% (v1.1)
 | Phase 07-validation P01 | 10 | 2 tasks | 4 files |
 | Phase 07-validation P01 | 20 | 3 tasks | 4 files |
 | Phase 08-analysis-integration P01 | 15 | 2 tasks | 1 files |
+| Phase 08-analysis-integration P02 | 15 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,10 @@ Recent decisions affecting current work:
 - [Phase 08-01]: Session state dict accumulates multiple uploads; store raw DataFrame pre-KPI in session_state; clearing upload widget does NOT remove from session_state
 - [Phase 08-01]: '.removesuffix() used to resolve display key back to session_state key consistently in both sidebar card and data pipeline
 - [Phase 08-01]: is_new guard prevents repeated st.rerun(); _upload_success one-shot flag shows success banner exactly once after upload
+- [Phase 08-02]: Clean if/else branch separation — comparison mode is a complete alternative rendering path, not merged into single-company mode
+- [Phase 08-02]: yaxis conflicts resolved via update_yaxes() calls rather than passing yaxis= to update_layout() when CHART_LAYOUT already has it
+- [Phase 08-02]: _pending_select flag consumed before selectbox widget renders to avoid post-render session state write timing error
+- [Phase 08-02]: Month-index x-axis alignment for companies with different date ranges; actual dates in hover customdata
 
 ### Pending Todos
 
@@ -89,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T02:19:27.144Z
-Stopped at: Completed 08-01 — upload-to-dropdown integration verified by human checkpoint
+Last session: 2026-03-11T02:40:49.685Z
+Stopped at: Completed 08-02 — comparison view verified by human checkpoint
 Resume file: None

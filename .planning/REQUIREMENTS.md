@@ -23,7 +23,7 @@ Requirements for milestone v1.1 — Dynamic Data Upload. Each maps to roadmap ph
 
 - [x] **ANLYS-01**: Uploaded companies appear in the sidebar dropdown for individual analysis
 - [x] **ANLYS-02**: All existing dashboard sections (Overview, Trends, Scorecard, Findings, Cash Flow) work on uploaded data
-- [ ] **ANLYS-03**: User can compare two companies side-by-side in a new comparison view
+- [x] **ANLYS-03**: User can compare two companies side-by-side in a new comparison view
 
 ## Future Requirements
 
@@ -57,7 +57,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VALID-03 | Phase 7 | Complete |
 | ANLYS-01 | Phase 8 | Complete |
 | ANLYS-02 | Phase 8 | Complete |
-| ANLYS-03 | Phase 8 | Pending |
+| ANLYS-03 | Phase 8 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 9 total
