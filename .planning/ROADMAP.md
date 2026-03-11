@@ -77,6 +77,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-5. Foundation | v1.0 | — | Complete | pre-GSD |
-| 6. File Input | v1.1 | 1/2 | In progress | - |
+| 6. File Input | 2/2 | Complete   | 2026-03-11 | - |
 | 7. Validation | v1.1 | 0/1 | Not started | - |
 | 8. Analysis Integration | v1.1 | 0/3 | Not started | - |

@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 ## Current Position
 
 Phase: 6 of 8 in v1.1 (File Input)
-Plan: 1 of 3 complete (06-01 done, 06-02 next)
+Plan: 2 of 3 complete (06-01 done, 06-02 done, 06-03 next)
 Status: In progress
-Last activity: 2026-03-11 — Completed 06-01 (template module and file-reading utilities)
+Last activity: 2026-03-10 — Completed 06-02 (sidebar upload wiring, template download, data source switching)
 
-Progress: [█░░░░░░░░░] 10% (v1.1)
+Progress: [██░░░░░░░░] 20% (v1.1)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: ~1 min
-- Total execution time: ~1 min
+- Total plans completed: 2
+- Average duration: ~5 min
+- Total execution time: ~11 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 06-file-input | 1 | ~1 min | ~1 min |
+| 06-file-input | 2 | ~11 min | ~5 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-01 (~1 min)
+- Last 5 plans: 06-01 (~1 min), 06-02 (~10 min)
 - Trend: —
 
 *Updated after each plan completion*
@@ -48,6 +48,9 @@ Recent decisions affecting current work:
 - [06-01] ValueError on parse failure; column validation deferred to Phase 7 validator
 - [06-01] Derived columns computed in read_uploaded_file() so existing pipeline unchanged
 - [06-01] Column names normalised (strip + lowercase) to handle spreadsheet export quirks
+- [06-02] Sidebar widgets declared before data pipeline block (Streamlit top-to-bottom execution requirement)
+- [06-02] Parse errors fall back to sample data with sidebar error — preserves usability with malformed files
+- [06-02] Uploaded file stem used as company display name (no extra UI input required)
 
 ### Pending Todos
 
@@ -59,6 +62,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11
-Stopped at: Completed 06-01-PLAN.md — ready for 06-02 (sidebar upload wiring)
+Last session: 2026-03-10
+Stopped at: Completed 06-02-PLAN.md — ready for 06-03 (column validator)
 Resume file: None

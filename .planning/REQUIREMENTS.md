@@ -9,9 +9,9 @@ Requirements for milestone v1.1 — Dynamic Data Upload. Each maps to roadmap ph
 
 ### Data Input
 
-- [ ] **INPUT-01**: User can upload CSV/Excel files via the sidebar
+- [x] **INPUT-01**: User can upload CSV/Excel files via the sidebar
 - [x] **INPUT-02**: User can download a pre-formatted template file showing the required data shape
-- [ ] **INPUT-03**: Sample companies (NovaSaaS, CloudForge) load by default when no files are uploaded
+- [x] **INPUT-03**: Sample companies (NovaSaaS, CloudForge) load by default when no files are uploaded
 
 ### Validation
 
@@ -49,9 +49,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INPUT-01 | Phase 6 | Pending |
+| INPUT-01 | Phase 6 | Complete |
 | INPUT-02 | Phase 6 | Complete (06-01) |
-| INPUT-03 | Phase 6 | Pending |
+| INPUT-03 | Phase 6 | Complete |
 | VALID-01 | Phase 7 | Pending |
 | VALID-02 | Phase 7 | Pending |
 | VALID-03 | Phase 7 | Pending |
