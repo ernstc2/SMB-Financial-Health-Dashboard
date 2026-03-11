@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Data Upload
 status: executing
-stopped_at: 08-01 Task 1 complete — awaiting human-verify checkpoint (Task 2)
-last_updated: "2026-03-11T02:11:42.753Z"
+stopped_at: Completed 08-01 — upload-to-dropdown integration verified by human checkpoint
+last_updated: "2026-03-11T02:19:27.146Z"
 last_activity: 2026-03-10 — Completed 06-02 (sidebar upload wiring, template download, data source switching)
 progress:
   total_phases: 3
@@ -52,6 +52,7 @@ Progress: [██░░░░░░░░] 20% (v1.1)
 *Updated after each plan completion*
 | Phase 07-validation P01 | 10 | 2 tasks | 4 files |
 | Phase 07-validation P01 | 20 | 3 tasks | 4 files |
+| Phase 08-analysis-integration P01 | 15 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,7 @@ Recent decisions affecting current work:
 - [Phase 07-01]: Validation errors render in st.container() placed after upload widget (not st.sidebar.error() at bottom)
 - [Phase 08-01]: Session state dict accumulates multiple uploads; store raw DataFrame pre-KPI in session_state; clearing upload widget does NOT remove from session_state
 - [Phase 08-01]: '.removesuffix() used to resolve display key back to session_state key consistently in both sidebar card and data pipeline
+- [Phase 08-01]: is_new guard prevents repeated st.rerun(); _upload_success one-shot flag shows success banner exactly once after upload
 
 ### Pending Todos
 
@@ -87,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T02:11:35.231Z
-Stopped at: 08-01 Task 1 complete — awaiting human-verify checkpoint (Task 2)
+Last session: 2026-03-11T02:19:27.144Z
+Stopped at: Completed 08-01 — upload-to-dropdown integration verified by human checkpoint
 Resume file: None
